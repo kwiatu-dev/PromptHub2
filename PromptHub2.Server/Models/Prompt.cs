@@ -18,7 +18,8 @@ namespace PromptHub2.Server.Models
         [MaxLength(256)]
         public string? Description { get; set; }
 
-        public List<Message> Messages { get; set; } = new();
+        [Required]
+        public List<Message> Messages { get; set; } = new List<Message>();
 
         [Required]
         [MaxLength(64)]

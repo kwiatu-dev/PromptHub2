@@ -1,17 +1,14 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.EntityFrameworkCore.Query;
-using PromptHub2.Server.Interfaces;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using PromptHub2.Server.Models;
-using System.Linq.Expressions;
+using System.Text.Json;
 
 namespace PromptHub2.Server.Data
 {
     public class AppDbContext : IdentityDbContext
     {
-        public AppDbContext(DbContextOptions options) : base(options) 
+        public AppDbContext(DbContextOptions options) : base(options)
         {
 
         }
@@ -21,15 +18,23 @@ namespace PromptHub2.Server.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Prompt>()
-                .OwnsMany(prompt => prompt.Messages, builder => { builder.ToJson(); })
                 .HasQueryFilter(prompt => prompt.IsDeleted == false);
 
             modelBuilder.Entity<Project>()
                 .HasQueryFilter(project => project.IsDeleted == false);
+
+            modelBuilder.Entity<Prompt>()
+                .Property(prompt => prompt.Messages)
+                .HasConversion(
+                    v => v == null ? null : JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                    v => v == null ? new List<Message>() : JsonSerializer.Deserialize<List<Message>>(v, new JsonSerializerOptions()) ?? new List<Message>())
+            .Metadata.SetValueComparer(new ValueComparer<List<Message>>(
+                (c1, c2) => (c1 == null && c2 == null) || (c1 != null && c2 != null && c1.SequenceEqual(c2)),
+                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                c => (List<Message>)c.ToList()));
         }
     }
 }
