@@ -30,7 +30,7 @@ namespace PromptHub2.Server.Services
                 .RuleFor(m => m.Content, f => f.Lorem.Paragraph().ClampLength(16, 64));
 
             var promptFaker = new Faker<Prompt>()
-                .RuleFor(p => p.Id, f => Guid.NewGuid())
+                .RuleFor(p => p.Id, f => Guid.NewGuid().ToString())
                 .RuleFor(p => p.Name, f => f.Lorem.Paragraph().ClampLength(10, 128))
                 .RuleFor(p => p.Description, f => f.Lorem.Paragraph().ClampLength(50, 256))
                 .RuleFor(p => p.Messages, f => messageFaker.Generate(f.Random.Int(1, 10)).ToList())
@@ -38,7 +38,7 @@ namespace PromptHub2.Server.Services
                 .RuleFor(p => p.Tokens, f => f.Random.Int(13, 16000))
                 .RuleFor(p => p.CreatedAt, f => f.Date.Between(new DateTime(2022, 1, 1), new DateTime(2023, 12, 31)))
                 .RuleFor(p => p.UpdatedAt, (f, p) => p.CreatedAt)
-                .RuleFor(p => p.IsDeleted, f => false);
+                .RuleFor(p => p.IsDeleted, f => f.Random.Bool());
 
             return promptFaker;
         }
@@ -46,14 +46,14 @@ namespace PromptHub2.Server.Services
         public static Faker<Project> GetProjectGenerator(List<IdentityUser> users)
         {
             var projectFaker = new Faker<Project>()
-                .RuleFor(p => p.Id, f => Guid.NewGuid())
+                .RuleFor(p => p.Id, f => Guid.NewGuid().ToString())
                 .RuleFor(p => p.Name, f => f.Lorem.Paragraph().ClampLength(10, 128))
                 .RuleFor(p => p.Description, f => f.Lorem.Paragraph().ClampLength(50, 256))
-                .RuleFor(p => p.CreatedBy, f => f.Random.ListItem(users))
-                .RuleFor(p => p.UpdatedBy, (f, u) => u.CreatedBy)
+                .RuleFor(p => p.CreatedById, f => f.Random.ListItem(users).Id)
+                .RuleFor(p => p.UpdatedById, (f, u) => u.CreatedById)
                 .RuleFor(p => p.CreatedAt, f => f.Date.Between(new DateTime(2022, 1, 1), new DateTime(2023, 12, 31)))
                 .RuleFor(p => p.UpdatedAt, (f, p) => p.CreatedAt)
-                .RuleFor(p => p.IsDeleted, f => false);
+                .RuleFor(p => p.IsDeleted, f => f.Random.Bool());
 
             return projectFaker;
         }

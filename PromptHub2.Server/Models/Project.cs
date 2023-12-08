@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using PromptHub2.Server.Interfaces;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PromptHub2.Server.Models
 {
     public class Project : ISoftDeleteEntity, IAuditableEntity
     {
         [Key]
-        public Guid Id { get; set; }
+        public string? Id { get; set; }
 
         [Required]
         [MaxLength(128)]
@@ -15,19 +16,26 @@ namespace PromptHub2.Server.Models
 
         [MaxLength(256)]
         public string? Description { get; set; }
+
         public ICollection<Prompt>? Prompts { get; set; }
 
         [Required]
         public DateTime? CreatedAt { get; set; }
 
         [Required]
-        public IdentityUser? CreatedBy { get; set; }
+        [ForeignKey("IdentityUser")]
+        public string? CreatedById { get; set; }
+
+        public virtual IdentityUser? CreatedBy { get; set; }
 
         [Required]
         public DateTime? UpdatedAt { get; set; }
 
         [Required]
-        public IdentityUser? UpdatedBy { get; set; }
+        [ForeignKey("IdentityUser")]
+        public string? UpdatedById { get; set; }
+
+        public virtual IdentityUser? UpdatedBy { get; set; }
 
         [Required]
         public bool IsDeleted { get; set; }

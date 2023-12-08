@@ -9,7 +9,7 @@ namespace PromptHub2.Server.Models
     public class Prompt : ISoftDeleteEntity, IAuditableEntity
     {
         [Key]
-        public Guid Id { get; set; }
+        public string? Id { get; set; }
 
         [Required]
         [MaxLength(128)]
@@ -29,20 +29,29 @@ namespace PromptHub2.Server.Models
         public int? Tokens { get; set; }
 
         [Required]
+        [ForeignKey("Project")]
+        public string? ProjectId { get; set; }
+
         [JsonIgnore]
-        public Project? Project { get; set; }
+        public virtual Project? Project { get; set; }
 
         [Required]
         public DateTime? CreatedAt { get; set; }
 
         [Required]
-        public IdentityUser? CreatedBy { get; set; }
+        [ForeignKey("IdentityUser")]
+        public string? CreatedById { get; set; }
+
+        public virtual IdentityUser? CreatedBy { get; set; }
 
         [Required]
         public DateTime? UpdatedAt { get; set; }
 
         [Required]
-        public IdentityUser? UpdatedBy { get; set; }
+        [ForeignKey("IdentityUser")]
+        public string? UpdatedById { get; set; }
+
+        public virtual IdentityUser? UpdatedBy { get; set; }
 
         [Required]
         public bool IsDeleted { get; set; }
@@ -51,7 +60,10 @@ namespace PromptHub2.Server.Models
 
     public class Message
     {
+        [JsonPropertyName("role")]
         public string? Role { get; set; }
+
+        [JsonPropertyName("content")]
         public string? Content { get; set; }
 
         public static implicit operator Message((string Role, string Content) values) =>

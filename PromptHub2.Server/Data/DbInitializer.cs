@@ -45,18 +45,9 @@ namespace PromptHub2.Server.Data
 
             for (int i = 0; i < prompts.Count; i++)
             {
-                prompts[i].Project = projects[i % projects.Count];
-            }
-
-            foreach (var project in projects)
-            {
-                project.Prompts = prompts.Where(p => p.Project == project).ToList();
-
-                foreach (var prompt in project.Prompts)
-                {
-                    prompt.CreatedBy = project.CreatedBy;
-                    prompt.UpdatedBy = project.UpdatedBy;
-                }
+                prompts[i].ProjectId = projects[i % projects.Count].Id;
+                prompts[i].CreatedById = projects[i % projects.Count].CreatedById;
+                prompts[i].UpdatedById = projects[i % projects.Count].UpdatedById;
             }
 
             builder.Entity<Prompt>().HasData(prompts);

@@ -20,6 +20,7 @@ builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
     string connectionString = builder.Configuration.GetConnectionString("PromptHub") ?? "Data Source=Default.db";
 
     options.UseSqlite(connectionString)
+        .EnableSensitiveDataLogging()
         .AddInterceptors(interceptorSoftDeletes)
         .AddInterceptors(interceptorAuditableEntities);
 });
