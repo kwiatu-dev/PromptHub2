@@ -22,6 +22,11 @@ public class SoftDeleteInterceptor : SaveChangesInterceptor
                 entry.Entity.IsDeleted = true;
                 entry.Entity.DeletedAt = DateTime.UtcNow;
             }
+
+            if (entry.State == EntityState.Added)
+            {
+                entry.Entity.IsDeleted = false;
+            }
         }
 
         return result;
@@ -45,6 +50,11 @@ public class SoftDeleteInterceptor : SaveChangesInterceptor
             {
                 entry.Entity.IsDeleted = true;
                 entry.Entity.DeletedAt = DateTime.UtcNow;
+            }
+
+            if (entry.State == EntityState.Added)
+            {
+                entry.Entity.IsDeleted = false;
             }
         }
 

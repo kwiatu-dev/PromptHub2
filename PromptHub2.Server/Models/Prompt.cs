@@ -9,7 +9,7 @@ namespace PromptHub2.Server.Models
     public class Prompt : ISoftDeleteEntity, IAuditableEntity
     {
         [Key]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
         [MaxLength(128)]

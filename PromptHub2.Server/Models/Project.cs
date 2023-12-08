@@ -7,10 +7,10 @@ namespace PromptHub2.Server.Models
     public class Project : ISoftDeleteEntity, IAuditableEntity
     {
         [Key]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
-        [MaxLength(100)]
+        [MaxLength(128)]
         public string? Name { get; set; }
 
         [MaxLength(256)]

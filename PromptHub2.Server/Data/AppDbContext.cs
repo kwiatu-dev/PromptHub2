@@ -35,6 +35,8 @@ namespace PromptHub2.Server.Data
                 (c1, c2) => (c1 == null && c2 == null) || (c1 != null && c2 != null && c1.SequenceEqual(c2)),
                 c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
                 c => (List<Message>)c.ToList()));
+
+            DbInitializer.Initialize(modelBuilder);
         }
     }
 }
