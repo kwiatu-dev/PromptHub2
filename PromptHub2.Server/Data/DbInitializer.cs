@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PromptHub2.Server.Infrastructure;
 using PromptHub2.Server.Models;
-using PromptHub2.Server.Services;
 using System.Runtime.CompilerServices;
 
 namespace PromptHub2.Server.Data
@@ -13,7 +12,7 @@ namespace PromptHub2.Server.Data
         public static void Initialize(ModelBuilder builder)
         {
             var roles = new List<IdentityRole>() { 
-                new IdentityRole { Id = Guid.NewGuid().ToString(), Name = Roles.Administrator }
+                new() { Id = Guid.NewGuid().ToString(), Name = Roles.Administrator }
             };
 
             builder.Entity<IdentityRole>().HasData(roles);
@@ -23,13 +22,15 @@ namespace PromptHub2.Server.Data
                 Id = Guid.NewGuid().ToString(),
                 UserName = "fi.kwiatkowski@gmail.com",
                 Email = "fi.kwiatkowski@gmail.com",
+                NormalizedEmail = "FI.KWIATKOWSKI@GMAIL.COM",
+                NormalizedUserName = "FI.KWIATKOWSKI@GMAIL.COM",
                 EmailConfirmed = true,
-                PasswordHash = new PasswordHasher<IdentityUser>().HashPassword(null, "Karteczka123!"),
             };
+
+            administrator.PasswordHash = new PasswordHasher<IdentityUser>().HashPassword(administrator, "Karteczka123!");
 
             var users = Fakers.GetUserGenerator().Generate(10);
             users.Add(administrator);
-
             builder.Entity<IdentityUser>().HasData(users);
 
             builder.Entity<IdentityUserRole<string>>().HasData(

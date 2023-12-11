@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using PromptHub2.Server.Infrastructure;
 using PromptHub2.Server.Models;
 
-namespace PromptHub2.Server.Services
+namespace PromptHub2.Server.Data
 {
     public class Fakers
     {
@@ -13,7 +13,9 @@ namespace PromptHub2.Server.Services
             var userFaker = new Faker<IdentityUser>()
                 .RuleFor(u => u.Id, f => Guid.NewGuid().ToString())
                 .RuleFor(u => u.UserName, f => f.Internet.Email())
+                .RuleFor(u => u.NormalizedUserName, (f, u) => u.UserName?.ToUpper())
                 .RuleFor(u => u.Email, (f, u) => u.UserName)
+                .RuleFor(u => u.NormalizedEmail, (f, u) => u.Email?.ToUpper())
                 .RuleFor(u => u.EmailConfirmed, f => f.Random.Bool())
                 .RuleFor(u => u.PasswordHash, (f, u) => new PasswordHasher<IdentityUser>().HashPassword(u, "Password@1"));
 

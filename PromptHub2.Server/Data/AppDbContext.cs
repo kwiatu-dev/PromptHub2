@@ -8,7 +8,7 @@ namespace PromptHub2.Server.Data
 {
     public class AppDbContext : IdentityDbContext
     {
-        public AppDbContext(DbContextOptions options) : base(options)
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
 
         }
