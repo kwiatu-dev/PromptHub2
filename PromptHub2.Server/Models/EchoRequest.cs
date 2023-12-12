@@ -1,6 +1,6 @@
 ﻿namespace PromptHub2.Server.Models
 {
-    public class EchoModel
+    public class EchoRequest
     {
         public string? Message { get; set; }
     }

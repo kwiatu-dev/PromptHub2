@@ -3,18 +3,18 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PromptHub2.Server.Infrastructure;
 using PromptHub2.Server.Models;
+using System.Net;
 
 namespace PromptHub2.Server.Controllers
 {
-    [Authorize(Roles = Roles.Administrator)]
-    [Route("[controller]")]
     [ApiController]
     public class EchoController : ControllerBase
     {
-        [HttpPost(Name = "Echo")]
-        public IActionResult Post([FromBody] EchoModel model)
+        [HttpPost("echo")]
+        public IActionResult Post(EchoRequest request)
         {
-            return Ok(new Response { Status = "Success", Message = model.Message });
+            throw new Exception("To jest błąd symulowany w kontrolerze SomeController");
+            //return Ok(new SuccedResponse { Status = "Success", Message = request.Message });
         }
 
     }
