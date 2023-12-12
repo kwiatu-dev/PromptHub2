@@ -6,25 +6,51 @@ namespace PromptHub2.Server.Validations
 {
     public class ValidateModelStateFilter : IActionFilter
     {
-        public void OnActionExecuted(ActionExecutedContext actionExecutedContext) 
-        { }
-
-        public void OnActionExecuting(ActionExecutingContext actionExecutingContext) 
+        public void OnActionExecuted(ActionExecutedContext context) 
         {
-            if(!actionExecutingContext.ModelState.IsValid)
+            if (!context.ModelState.IsValid)
             {
-                var messages = actionExecutingContext.ModelState
-                    .SelectMany(message => message.Value.Errors)
-                    .Select(error => error.ErrorMessage)
-                    .ToList();
+                var errors = context.ModelState
+                    .Where(x => x.Value != null && x.Value.Errors.Any())
+                    .ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value?.Errors?
+                            .Where(error => error != null)
+                            .Select(error => error.ErrorMessage)
+                            .ToArray() ?? Array.Empty<string>()
+                    );
 
-                actionExecutingContext.Result = new BadRequestObjectResult(
-                    new FailedResponse
-                    {
-                        Status = "Error",
-                        Message = "Wystąpił jeden lub więcej błędów podczas walidacji.",
-                        Errors = messages
-                    });
+                var errorResponse = new ErrorResponse
+                {
+                    Status = "Error",
+                    Errors = errors
+                };
+
+                context.Result = new BadRequestObjectResult(errorResponse);
+            }
+        }
+
+        public void OnActionExecuting(ActionExecutingContext context) 
+        {
+            if(!context.ModelState.IsValid)
+            {
+                var errors = context.ModelState
+                    .Where(x => x.Value != null && x.Value.Errors.Any())
+                    .ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value?.Errors?
+                            .Where(error => error != null)
+                            .Select(error => error.ErrorMessage)
+                            .ToArray() ?? Array.Empty<string>()
+                    );
+
+                var errorResponse = new ErrorResponse
+                {
+                    Status = "Error",
+                    Errors = errors
+                };
+
+                context.Result = new BadRequestObjectResult(errorResponse);
             }
         }
     }

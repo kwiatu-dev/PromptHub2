@@ -57,17 +57,30 @@ namespace PromptHub2.Server.Controllers
 
                     var token = CreateToken(authClaims);
 
-                    return Ok(new { 
-                        token = new JwtSecurityTokenHandler().WriteToken(token)
+                    return Ok(new SuccedResponse{ 
+                        Message = new JwtSecurityTokenHandler().WriteToken(token),
                     });
                 }
                 else if(result.IsLockedOut)
                 {
-                    return StatusCode(StatusCodes.Status423Locked, new SuccedResponse { Status = "Error", Message = "You are locked out, try again later." });
+                    return StatusCode(
+                        StatusCodes.Status423Locked, 
+                        new ErrorResponse { 
+                            Errors = new Dictionary<string, string[]>
+                            {
+                                { "authentication", new[] { "Przeroczono limit prób logowania." } }
+                            }
+                        });
                 }
             }
 
-            return Unauthorized();
+            return Unauthorized(new ErrorResponse
+            {
+                Errors = new Dictionary<string, string[]> 
+                {
+                    { "authentication", new[] { "Nieprawidłowy adres email lub hasło." } }
+                }
+            });
         }
 
         [HttpPost]
@@ -81,12 +94,19 @@ namespace PromptHub2.Server.Controllers
             };
 
             var result = await _userManager.CreateAsync(user, request.Password);
-            if (!result.Succeeded)
+            if (result.Errors.Any())
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new SuccedResponse { Status = "Error", Message = "User creation failed" });
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError, 
+                    new ErrorResponse { 
+                        Message = "Wystąpił problem podczas próby utworzenia użytkownika.",
+                        Errors = result.Errors.ToDictionary(e => e.Code, e => new[] { e.Description } )
+                    });
             }
 
-            return Ok(new SuccedResponse { Status = "Success", Message = "User created successfully" });
+            return Ok(new SuccedResponse { 
+                Message = "Użytkownik został pomyślnie utworzony."
+            });
         }
 
         private JwtSecurityToken CreateToken(List<Claim> authClaims)

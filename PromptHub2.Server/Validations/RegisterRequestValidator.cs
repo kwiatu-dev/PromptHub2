@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using PromptHub2.Server.Models;
 
 namespace PromptHub2.Server.Validations
