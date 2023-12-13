@@ -13,7 +13,7 @@ namespace PromptHub2.Server.Validations
                 var errors = context.ModelState
                     .Where(x => x.Value != null && x.Value.Errors.Any())
                     .ToDictionary(
-                        kvp => kvp.Key,
+                        kvp => kvp.Key.ToLower(),
                         kvp => kvp.Value?.Errors?
                             .Where(error => error != null)
                             .Select(error => error.ErrorMessage)
@@ -22,7 +22,6 @@ namespace PromptHub2.Server.Validations
 
                 var errorResponse = new ErrorResponse
                 {
-                    Status = "Error",
                     Errors = errors
                 };
 
@@ -37,7 +36,7 @@ namespace PromptHub2.Server.Validations
                 var errors = context.ModelState
                     .Where(x => x.Value != null && x.Value.Errors.Any())
                     .ToDictionary(
-                        kvp => kvp.Key,
+                        kvp => kvp.Key.ToLower(),
                         kvp => kvp.Value?.Errors?
                             .Where(error => error != null)
                             .Select(error => error.ErrorMessage)
@@ -46,7 +45,6 @@ namespace PromptHub2.Server.Validations
 
                 var errorResponse = new ErrorResponse
                 {
-                    Status = "Error",
                     Errors = errors
                 };
 

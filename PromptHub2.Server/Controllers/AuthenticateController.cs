@@ -57,8 +57,8 @@ namespace PromptHub2.Server.Controllers
 
                     var token = CreateToken(authClaims);
 
-                    return Ok(new SuccedResponse{ 
-                        Message = new JwtSecurityTokenHandler().WriteToken(token),
+                    return Ok(new { 
+                        token = new JwtSecurityTokenHandler().WriteToken(token),
                     });
                 }
                 else if(result.IsLockedOut)

@@ -1,14 +1,18 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PromptHub2.Server.Common;
 using PromptHub2.Server.Data;
+using PromptHub2.Server.Infrastructure;
 using PromptHub2.Server.Models;
+using PromptHub2.Server.Services;
 using PromptHub2.Server.Validations;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -67,7 +71,30 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = configuration["JWT:ValidIssuer"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"] ?? ""))
     };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnChallenge = async context =>
+        {
+            context.HandleResponse();
+
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+
+            await context.Response.WriteAsJsonAsync(new ErrorResponse
+            {
+                Errors = new Dictionary<string, string[]> { 
+                    { "authentication", new[] { "Odmowa dostêpu." } } 
+                }
+            });
+        }
+    };
 });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly",
+        policy => policy.RequireClaim(ClaimTypes.Role, Roles.Administrator));
+}).AddSingleton<IAuthorizationMiddlewareResultHandler, SampleAuthorizationMiddlewareResultHandler>();
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {

@@ -42,7 +42,7 @@
 
   <ItemGroup>
     <Folder Include="Databases\" />
-    <Folder Include="Services\" />
+    <Folder Include="Middlewares\" />
   </ItemGroup>
 
 </Project>
