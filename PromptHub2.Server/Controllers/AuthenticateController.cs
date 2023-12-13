@@ -104,8 +104,48 @@ namespace PromptHub2.Server.Controllers
                     });
             }
 
+            var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var confirmationLink = Url.Action(nameof(ConfirmEmail), new { token = confirmationToken, email = user.Email });
+
+            //send email with confirmationLink
+
             return Ok(new SuccedResponse { 
                 Message = "Użytkownik został pomyślnie utworzony."
+            });
+        }
+
+        [HttpGet]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<IActionResult> ConfirmEmail(string token, string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user != null)
+            {
+                var result = await _userManager.ConfirmEmailAsync(user, token);
+
+                if(result.Errors.Any())
+                {
+                    return BadRequest(
+                        new ErrorResponse
+                        {
+                            Message = "Nie udało się zweryfikować adresu email.",
+                            Errors = result.Errors.ToDictionary(e => e.Code, e => new[] { e.Description })
+                        });
+                }
+                else
+                {
+                    return Ok(new SuccedResponse
+                    {
+                        Message = "Adres email został zwerfikowany pomyślnie."
+                    });
+                }
+            }
+
+            return BadRequest(new ErrorResponse
+            {
+                Errors = new Dictionary<string, string[]> { 
+                    { "link", new[] { "Nie udało się zweryfikować adresu email." } }
+                }
             });
         }
 
