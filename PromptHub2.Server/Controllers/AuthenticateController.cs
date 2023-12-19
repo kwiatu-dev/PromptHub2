@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using PromptHub2.Server.Interfaces;
 using PromptHub2.Server.Models;
 using PromptHub2.Server.Validations;
 using System.IdentityModel.Tokens.Jwt;
@@ -10,30 +11,33 @@ using System.Text;
 
 namespace PromptHub2.Server.Controllers
 {
-    [Route("authenticate")]
+    [Route("Authenticate")]
     [ApiController]
     public class AuthenticateController : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         //private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IMailService _mailService;
         private readonly IConfiguration _configuration;
 
         public AuthenticateController(
             UserManager<IdentityUser> userManager, 
             SignInManager<IdentityUser> signInManager,
             RoleManager<IdentityRole> roleManager,
+            IMailService mailService,
             IConfiguration configuration
             ) 
         {
             _userManager = userManager;
             _signInManager = signInManager;
             //_roleManager = roleManager;
+            _mailService = mailService;
             _configuration = configuration;
         }
 
         [HttpPost]
-        [Route("login")]
+        [Route("Login")]
         public async Task<IActionResult> Login(LoginRequest request)
         {
             var user = await _userManager.FindByEmailAsync(request.Email);
@@ -72,6 +76,17 @@ namespace PromptHub2.Server.Controllers
                             }
                         });
                 }
+                else if (result.IsNotAllowed)
+                {
+                    return BadRequest(
+                        new ErrorResponse
+                        {
+                            Errors = new Dictionary<string, string[]>
+                            {
+                                { "ConfirmEmail", new[] { "Zweryfikuj adres email." } }
+                            }
+                        });
+                }
             }
 
             return Unauthorized(new ErrorResponse
@@ -84,7 +99,7 @@ namespace PromptHub2.Server.Controllers
         }
 
         [HttpPost]
-        [Route("register")]
+        [Route("Register")]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
             var user = new IdentityUser
@@ -105,23 +120,32 @@ namespace PromptHub2.Server.Controllers
             }
 
             var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var confirmationLink = Url.Action(nameof(ConfirmEmail), new { token = confirmationToken, email = user.Email });
+            var clientUrl = _configuration["Endpoints:Client"];
+            var confirmationLink = clientUrl + Url.Action(nameof(ConfirmEmail), new { token = confirmationToken, email = user.Email });
 
-            //send email with confirmationLink
+            var mailData = new MailData
+            {
+                EmailToId = user.Email,
+                EmailSubject = "Weryfikacja adresu email",
+                EmailBody = confirmationLink
+            };
+
+            await _mailService.SendMailAsync(mailData);
 
             return Ok(new SuccedResponse { 
                 Message = "Użytkownik został pomyślnie utworzony."
             });
         }
 
-        [HttpGet]
+        [HttpPost]
+        [Route("ConfirmEmail")]
         [ApiExplorerSettings(IgnoreApi = true)]
-        public async Task<IActionResult> ConfirmEmail(string token, string email)
+        public async Task<IActionResult> ConfirmEmail(ConfirmEmailRequest request)
         {
-            var user = await _userManager.FindByEmailAsync(email);
+            var user = await _userManager.FindByEmailAsync(request.Email);
             if (user != null)
             {
-                var result = await _userManager.ConfirmEmailAsync(user, token);
+                var result = await _userManager.ConfirmEmailAsync(user, request.Token);
 
                 if(result.Errors.Any())
                 {
@@ -144,7 +168,7 @@ namespace PromptHub2.Server.Controllers
             return BadRequest(new ErrorResponse
             {
                 Errors = new Dictionary<string, string[]> { 
-                    { "link", new[] { "Nie udało się zweryfikować adresu email." } }
+                    { "url", new[] { "Link wygasł." } }
                 }
             });
         }

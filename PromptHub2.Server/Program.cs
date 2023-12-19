@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using PromptHub2.Server;
 using PromptHub2.Server.Common;
 using PromptHub2.Server.Data;
 using PromptHub2.Server.Infrastructure;
+using PromptHub2.Server.Interfaces;
 using PromptHub2.Server.Models;
 using PromptHub2.Server.Services;
 using PromptHub2.Server.Validations;
@@ -51,6 +53,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
     
     options.User.RequireUniqueEmail = true;
 
+    options.SignIn.RequireConfirmedEmail = true;
 }).AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
@@ -108,6 +111,9 @@ builder.Services.AddControllers(options =>
 {
     options.Filters.Add<ValidateModelStateFilter>();
 });
+
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+builder.Services.AddTransient<IMailService, MailService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

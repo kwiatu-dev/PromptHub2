@@ -7,7 +7,7 @@ using System.Net;
 
 namespace PromptHub2.Server.Controllers
 {
-    [Authorize(Roles = "admin")]
+    [Authorize]
     [ApiController]
     public class EchoController : ControllerBase
     {

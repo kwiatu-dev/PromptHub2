@@ -1,12 +1,11 @@
 ﻿using FluentValidation;
-using Microsoft.AspNetCore.Identity;
 using PromptHub2.Server.Models;
 
 namespace PromptHub2.Server.Validations
 {
-    public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
+    public class ResetPasswordValidator : AbstractValidator<ResetPasswordRequest>
     {
-        public RegisterRequestValidator()
+        public ResetPasswordValidator() 
         {
             RuleFor(x => x.Email)
                 .EmailAddress().WithMessage("Niepoprawny format adresu e-mail.");
@@ -18,6 +17,13 @@ namespace PromptHub2.Server.Validations
                 .Matches("[a-z]").WithMessage("Hasło musi zawierać co najmniej jedną małą literę.")
                 .Matches("[0-9]").WithMessage("Hasło musi zawierać co najmniej jedną cyfrę.")
                 .Matches("[^a-zA-Z0-9]").WithMessage("Hasło musi zawierać co najmniej jeden znak specjalny.");
+
+            RuleFor(x => x.ConfirmPassword)
+                .Equal(x => x.Password).WithMessage("Potwierdzenie hasła nie pasuje do hasła.");
+
+            RuleFor(x => x.Token)
+                .NotEmpty().WithMessage("Token nie został wprowadzony.");
+
         }
     }
 }
