@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.label{
+    @apply block text-base;
+}
+
+.input-text{
+    @apply w-full block border-solid border-2 border-gray-200 p-1 text-lg;
+}
+
+.input-error{
+    @apply text-sm text-red-600 mt-1;
+}
+
+.title{
+    @apply text-3xl mb-4 font-medium;
+}
