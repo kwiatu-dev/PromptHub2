@@ -72,7 +72,7 @@ namespace PromptHub2.Server.Controllers
                         new ErrorResponse { 
                             Errors = new Dictionary<string, string[]>
                             {
-                                { "authentication", new[] { "Przeroczono limit prób logowania." } }
+                                { "email", new[] { "Przeroczono limit prób logowania." } }
                             }
                         });
                 }
@@ -83,7 +83,7 @@ namespace PromptHub2.Server.Controllers
                         {
                             Errors = new Dictionary<string, string[]>
                             {
-                                { "ConfirmEmail", new[] { "Zweryfikuj adres email." } }
+                                { "email", new[] { "Zweryfikuj adres email." } }
                             }
                         });
                 }
@@ -93,7 +93,7 @@ namespace PromptHub2.Server.Controllers
             {
                 Errors = new Dictionary<string, string[]> 
                 {
-                    { "authentication", new[] { "Nieprawidłowy adres email lub hasło." } }
+                    { "email", new[] { "Nieprawidłowy adres email lub hasło." } }
                 }
             });
         }
@@ -115,7 +115,10 @@ namespace PromptHub2.Server.Controllers
                     StatusCodes.Status500InternalServerError, 
                     new ErrorResponse { 
                         Message = "Wystąpił problem podczas próby utworzenia użytkownika.",
-                        Errors = result.Errors.ToDictionary(e => e.Code, e => new[] { e.Description } )
+                        Errors = new Dictionary<string, string[]>
+                        {
+                            { "email", result.Errors.Select(e => e.Description).ToArray() }
+                        }
                     });
             }
 

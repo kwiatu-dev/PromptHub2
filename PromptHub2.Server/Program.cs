@@ -24,6 +24,19 @@ ConfigurationManager configuration = builder.Configuration;
 builder.Services.AddSingleton<SoftDeleteInterceptor>();
 builder.Services.AddSingleton<AuditableEntitiesInterceptor>();
 
+var AllowClientOrigin = "_allowClientOrigin";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: AllowClientOrigin,
+        policy =>
+        {
+            policy.WithOrigins(configuration["Endpoints:Client"] ?? "")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+        });
+});
+
 builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
 {
     var interceptorSoftDeletes = serviceProvider
@@ -123,6 +136,7 @@ var app = builder.Build();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
+app.UseCors(AllowClientOrigin);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

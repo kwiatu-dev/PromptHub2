@@ -1,28 +1,54 @@
 import axios from 'axios'
+import Cookies from 'universal-cookie'
+import parseJwt from '@/helpers/parseJwt.js'
+const cookies = new Cookies()
 
-const state = {
+const state = () => ({
   user: null,
-}
+})
 const getters = {
-  isAuthenticated: state => !!state.email,
-  StateUser: state => state.email,
+  isAuthenticated: state => !!state.user,
+  StateUser: state => state.user,
 }
 const actions = {
-  async SignUp({dispatch}, form){
-    await axios.post('/Authenticate/Register', form)
-    await dispatch('LogIn', form)
+  async SignUp(_, form){
+    try{
+      const response = await axios.post('/Authenticate/Register', form)
+
+      return response.data
+    }
+    catch(error){
+      return error.response.data
+    }
+    
   },
   async LogIn({commit}, form){
-    await axios.post('/Authenticate/Login', form)
-    await commit('setUser', form.email)
+    try{
+      const response = await axios.post('/Authenticate/Login', form)
+      const tokenString = response.data.token 
+      const token = parseJwt(tokenString)
+      const expires = new Date(token.exp * 1000)
+      cookies.set('token', tokenString, { expires })
+
+      await commit('setUser', {
+        email: form.email,
+        token: response.data.token,
+      })
+
+      return response.data
+    }
+    catch(error){
+      return error.response.data
+    }
   },
   async LogOut({commit}){
-    commit('logout')
+    cookies.remove('token')
+    commit('LogOut')
   },
 }
 const mutations = {
-  setUser(state, email){
-    state.user = email
+  setUser(state, user){
+    state.user = user
   },
   LogOut(state){
     state.user = null

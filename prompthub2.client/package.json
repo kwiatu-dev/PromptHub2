@@ -16,7 +16,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.5.1",
     "@fortawesome/vue-fontawesome": "^3.0.5",
     "axios": "^1.6.3",
-    "dotenv": "^16.3.1",
+    "universal-cookie": "^7.0.0",
     "vue": "^3.3.10",
     "vue-router": "^4.2.5",
     "vuex": "^4.1.0"

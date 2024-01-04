@@ -4,10 +4,10 @@
       <div class="flex flex-row gap-4 items-center">
         <RouterLink :to="{name: 'home'}" class="title-font font-mediumtext-gray-900 text-2xl">PromptHub</RouterLink>
         <nav class="flex flex-wrap justify-start items-center text-base gap-2">
-          <RouterLink :to="{name: 'home'}">Projects</RouterLink>
+          <RouterLink :to="{name: 'projects'}">Projects</RouterLink>
         </nav>
       </div>
-      <div v-if="isLoggedIn" class="flex flex-row gap-4">
+      <div v-if="!isLoggedIn" class="flex flex-row gap-4">
         <RouterLink :to="{name: 'login'}" class="inline-flex items-center border-solid border-2 border-gray-100 py-1 px-3 rounded text-base">
           Sign in
         </RouterLink>
