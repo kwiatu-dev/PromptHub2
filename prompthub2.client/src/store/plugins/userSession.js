@@ -1,7 +1,7 @@
 import parseJwt from '@/helpers/parseJwt.js'
 import Cookies from 'universal-cookie'
+import { ROLE_SCHEMA, EMAIL_SCHEMA } from '@/data/schemas'
 const cookies = new Cookies()
-const EMAIL_SCHEMA = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'
 
 export const userSessionPlugin = (store) => {
   const tokenString = cookies.get('token')
@@ -12,6 +12,7 @@ export const userSessionPlugin = (store) => {
     store.state.auth.user = {
       email: token[EMAIL_SCHEMA],
       token: tokenString,
+      role: token[ROLE_SCHEMA] ?? null,
     }
   }
 }

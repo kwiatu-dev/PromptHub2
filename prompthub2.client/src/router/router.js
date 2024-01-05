@@ -6,6 +6,7 @@ import ProjectPage from '@/Pages/Project/ProjectPage.vue'
 import ConfirmEmail from '@/Pages/Auth/ConfirmEmail.vue'
 import ForgotPasswordPage from '@/Pages/User/ForgotPasswordPage.vue'
 import ResetPasswordPage from '@/Pages/User/ResetPasswordPage.vue'
+import AdminPage from '@/Pages/Admin/AdminPage.vue'
 import store from '@/store'
 
 const routes = [
@@ -20,37 +21,43 @@ const routes = [
     path: '/projects',
     component: ProjectPage,
     name: 'projects',
-    meta: { requiresAuth: true },
+    meta: { auth: true },
   },
   {
     path: '/login',
     component: LoginPage,
     name: 'login',
-    meta: { auth: true },
+    meta: { guest: true },
   },
   {
     path: '/register',
     component: UserCreate,
     name: 'register',
-    meta: { auth: true },
+    meta: { guest: true },
   },
   {
     path: '/Authenticate/ConfirmEmail',
     component: ConfirmEmail,
     name: 'confirm_email',
-    meta: { auth: true },
+    meta: { guest: true },
   },
   {
     path: '/Account/ForgotPassword',
     component: ForgotPasswordPage,
     name: 'forgot_password',
-    meta: { auth: true },
+    meta: { guest: true },
   },
   {
     path: '/Account/ResetPassword',
     component: ResetPasswordPage,
     name: 'reset_password',
-    meta: { auth: true },
+    meta: { guest: true },
+  },
+  {
+    path: '/AdminPage',
+    component: AdminPage,
+    name: 'admin',
+    meta: { roles: ['admin'] },
   },
 ]
 
@@ -59,30 +66,26 @@ const router = createRouter({
   routes,
 })
 
-router.beforeEach((to, from, next) => {
-  if(to.matched.some(record => record.meta.requiresAuth)){
-    if(store.getters.isAuthenticated){
-      next()
-      return
-    }
-    next({ name: 'login' })
-  }
-  else{
-    next()
-  }
-})
+// router.beforeEach((to, from, next) => {
+//   const { roles } = to.meta
+//   const user = store.getters.StateUser
+
+//   if(roles){
+//     console.log(store.getters)
+//   }
+
+//   next()
+// })
 
 router.beforeEach((to, from, next) => {
-  if(to.matched.some(record => record.meta.auth)){
-    if(store.getters.isAuthenticated){
-      next({ name: 'home' })
-      return
-    }
-    next()
+  const { auth } = to.meta
+  const isAuth = store.getters.isAuthenticated
+
+  if(auth === true && isAuth === false){
+    next({ name: 'login' })
+    return
   }
-  else{
-    next()
-  }
+  next()
 })
 
 export default router

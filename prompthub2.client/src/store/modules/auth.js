@@ -1,6 +1,7 @@
 import axios from 'axios'
 import Cookies from 'universal-cookie'
 import parseJwt from '@/helpers/parseJwt.js'
+import { ROLE_SCHEMA, EMAIL_SCHEMA } from '@/data/schemas'
 const cookies = new Cookies()
 
 const state = () => ({
@@ -31,8 +32,9 @@ const actions = {
       cookies.set('token', tokenString, { expires })
 
       await commit('setUser', {
-        email: form.email,
+        email: token[EMAIL_SCHEMA],
         token: response.data.token,
+        role: token[ROLE_SCHEMA] ?? null,
       })
 
       return response.data
