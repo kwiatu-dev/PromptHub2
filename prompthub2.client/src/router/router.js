@@ -5,6 +5,7 @@ import UserCreate from '@/Pages/User/UserCreate.vue'
 import ProjectPage from '@/Pages/Project/ProjectPage.vue'
 import ConfirmEmail from '@/Pages/Auth/ConfirmEmail.vue'
 import ForgotPasswordPage from '@/Pages/User/ForgotPasswordPage.vue'
+import ResetPasswordPage from '@/Pages/User/ResetPasswordPage.vue'
 import store from '@/store'
 
 const routes = [
@@ -43,6 +44,12 @@ const routes = [
     path: '/Account/ForgotPassword',
     component: ForgotPasswordPage,
     name: 'forgot_password',
+    meta: { auth: true },
+  },
+  {
+    path: '/Account/ResetPassword',
+    component: ResetPasswordPage,
+    name: 'reset_password',
     meta: { auth: true },
   },
 ]

@@ -8,6 +8,7 @@ namespace PromptHub2.Server.Validations
         public ForgotPasswordRequestValidator() 
         {
             RuleFor(x => x.Email)
+                .NotEmpty().WithMessage("Niepoprawny format adresu e-mail.")
                 .EmailAddress().WithMessage("Niepoprawny format adresu e-mail.");
         }
     }

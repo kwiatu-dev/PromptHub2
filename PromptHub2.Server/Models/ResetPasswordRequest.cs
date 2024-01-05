@@ -1,4 +1,7 @@
-﻿namespace PromptHub2.Server.Models
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+
+namespace PromptHub2.Server.Models
 {
     public class ResetPasswordRequest
     {

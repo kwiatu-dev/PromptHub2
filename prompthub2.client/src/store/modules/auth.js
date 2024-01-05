@@ -45,6 +45,16 @@ const actions = {
     cookies.remove('token')
     commit('LogOut')
   },
+  async ConfirmEmail(_, payload){
+    try{
+      const response = await axios.post('/Authenticate/ConfirmEmail', payload)
+
+      return response.data
+    }
+    catch(error){
+      return error.response.data
+    }
+  },
 }
 const mutations = {
   setUser(state, user){

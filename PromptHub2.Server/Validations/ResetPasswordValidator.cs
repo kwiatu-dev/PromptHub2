@@ -19,10 +19,11 @@ namespace PromptHub2.Server.Validations
                 .Matches("[^a-zA-Z0-9]").WithMessage("Hasło musi zawierać co najmniej jeden znak specjalny.");
 
             RuleFor(x => x.ConfirmPassword)
+                .NotEmpty().WithMessage("Potwierdzenie hasła jest wymagane.")
                 .Equal(x => x.Password).WithMessage("Potwierdzenie hasła nie pasuje do hasła.");
 
             RuleFor(x => x.Token)
-                .NotEmpty().WithMessage("Token nie został wprowadzony.");
+                .NotEmpty().WithMessage("Token nie został podany.");
 
         }
     }

@@ -14,12 +14,10 @@
       </div>
       <div class="col-span-12">
         <div class="flex flex-row items-center justify-start gap-4">
-          <button type="submit" class="block bg-gray-300 px-4 py-1">Sign In</button>
+          <button type="submit" class="btn-submit">Sign In</button>
           <RouterLink :to="{name: 'forgot_password'}">Forgot password? Click Here!</RouterLink>
         </div>
-        <div v-if="showErrorMessage" class="input-error">
-          Wystąpił co najmniej jeden błąd podczas przesyłania formularza!
-        </div>
+        <FormMessage :message="message" :status="status" />
       </div>
     </form>
     <div class="bg-gray-300 px-4 py-2">
@@ -31,13 +29,16 @@
 <script setup>
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
-import { reactive, computed } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import FormError from '@/components/FormError.vue'
+import FormMessage from '@/components/FormMessage.vue'
 
 const router = useRouter()
 const store = useStore()
 
 const LogIn = async (form) => await store.dispatch('LogIn', form)
+const message = ref(null)
+const status = ref(null)
 
 const form = reactive({
   email: null,
@@ -45,15 +46,13 @@ const form = reactive({
   errors: {},
 })
 
-const showErrorMessage = computed(() => form.errors && Object.keys(form.errors).length)
-
 const auth = async () => {
   const response = await LogIn(form)
+  message.value = response.message
+  status.value = response.status
+  form.errors = response.errors ?? {}
 
-  if(response.errors){
-    form.errors = response.errors
-  }
-  else{
+  if(!response.errors){
     form.errors = {}
     router.push({ name: 'home' })
   }
