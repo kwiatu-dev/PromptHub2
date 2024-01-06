@@ -2,6 +2,7 @@
 using PromptHub2.Server.Interfaces;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace PromptHub2.Server.Models
 {
@@ -26,6 +27,7 @@ namespace PromptHub2.Server.Models
         [ForeignKey("IdentityUser")]
         public string? CreatedById { get; set; }
 
+        [JsonIgnore]
         public virtual IdentityUser? CreatedBy { get; set; }
 
         [Required]
@@ -35,6 +37,7 @@ namespace PromptHub2.Server.Models
         [ForeignKey("IdentityUser")]
         public string? UpdatedById { get; set; }
 
+        [JsonIgnore]
         public virtual IdentityUser? UpdatedBy { get; set; }
 
         [Required]

@@ -66,26 +66,55 @@ const router = createRouter({
   routes,
 })
 
-// router.beforeEach((to, from, next) => {
-//   const { roles } = to.meta
-//   const user = store.getters.StateUser
-
-//   if(roles){
-//     console.log(store.getters)
-//   }
-
-//   next()
-// })
-
 router.beforeEach((to, from, next) => {
   const { auth } = to.meta
-  const isAuth = store.getters.isAuthenticated
+  const isAuthenticated = store.getters.isAuthenticated
 
-  if(auth === true && isAuth === false){
+  if(auth){
+    if(isAuthenticated){
+      next()
+      return
+    }
     next({ name: 'login' })
     return
   }
   next()
 })
+
+router.beforeEach((to, from, next) => {
+  const { roles } = to.meta
+  const isAuthenticated = store.getters.isAuthenticated
+  const user = store.getters.StateUser
+
+  if(roles){
+    if(isAuthenticated){
+      if(roles.includes(user.role)){
+        next()
+        return
+      }
+      next({ name: to.from })
+      return
+    }
+    next({ name: 'login' })
+    return
+  }
+  next()
+})
+
+router.beforeEach((to, from, next) => {
+  const { guest } = to.meta
+  const isAuthenticated = store.getters.isAuthenticated
+
+  if(guest){
+    if(isAuthenticated && to.name !== 'home'){
+      next({ name: 'home' })
+      return
+    }
+    next()
+    return
+  }
+  next()
+})
+
 
 export default router

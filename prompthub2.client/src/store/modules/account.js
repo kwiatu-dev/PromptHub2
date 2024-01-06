@@ -1,7 +1,4 @@
 import axios from 'axios'
-import Cookies from 'universal-cookie'
-import parseJwt from '@/helpers/parseJwt.js'
-const cookies = new Cookies()
 
 const state = () => ({
   

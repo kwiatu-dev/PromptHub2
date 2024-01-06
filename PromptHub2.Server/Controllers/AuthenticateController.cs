@@ -50,6 +50,7 @@ namespace PromptHub2.Server.Controllers
 
                     var authClaims = new List<Claim>
                     {
+                        new(ClaimTypes.NameIdentifier, user.Id),
                         new(ClaimTypes.Email, request.Email),
                         new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                     };

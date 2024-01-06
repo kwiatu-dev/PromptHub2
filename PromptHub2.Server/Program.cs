@@ -23,6 +23,7 @@ ConfigurationManager configuration = builder.Configuration;
 // Add services to the container.
 builder.Services.AddSingleton<SoftDeleteInterceptor>();
 builder.Services.AddSingleton<AuditableEntitiesInterceptor>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
 
 var AllowClientOrigin = "_allowClientOrigin";
 builder.Services.AddCors(options =>

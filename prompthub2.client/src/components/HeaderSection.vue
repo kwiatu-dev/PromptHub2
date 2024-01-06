@@ -1,6 +1,6 @@
 <template>
   <header class="text-gray-600 body-font border-solid border-b-2 border-gray-200">
-    <div class="container mx-auto flex flex-wrap py-5 justify-between flex-col md:flex-row items-center">
+    <div class="container mx-auto flex flex-wrap py-5 justify-between flex-col md:flex-row items-center px-4 md:px-0">
       <div class="flex flex-row gap-4 items-center">
         <RouterLink :to="{name: 'home'}" class="title-font font-mediumtext-gray-900 text-2xl">PromptHub</RouterLink>
         <nav class="flex flex-wrap justify-start items-center text-base gap-2">
