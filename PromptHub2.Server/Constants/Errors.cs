@@ -13,5 +13,6 @@
         public const string ErrorOccurred = "At least one error has occurred";
         public const string UserDoesNotHaveRights = "The user does not have the following rights:";
         public const string AccessDenied = "Access denied.";
+        public const string ServerConfigurationError = "An unexpected error occurred on the server configuration side";
     }
 }

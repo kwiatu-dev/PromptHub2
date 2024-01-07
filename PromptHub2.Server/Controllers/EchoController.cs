@@ -8,14 +8,13 @@ using System.Net;
 
 namespace PromptHub2.Server.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "admin")]
     [ApiController]
     public class EchoController : ControllerBase
     {
         [HttpPost("echo")]
         public IActionResult Post(EchoRequest request)
         {
-            //throw new Exception("To jest błąd symulowany w kontrolerze SomeController");
             return Ok(new SuccedResponse { Message = request.Message });
         }
 
