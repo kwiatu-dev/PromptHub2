@@ -1,8 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using PromptHub2.Server.Constants;
 using PromptHub2.Server.Interfaces;
 using PromptHub2.Server.Models;
+using PromptHub2.Server.Models.Requests;
+using PromptHub2.Server.Models.Responses;
+using System;
+using System.Security.Policy;
 
 namespace PromptHub2.Server.Controllers
 {
@@ -10,51 +15,22 @@ namespace PromptHub2.Server.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
-        //private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly IMailService _mailService;
-        private readonly IConfiguration _configuration;
+        private readonly IAccountService _accountService;
 
-        public AccountController(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
-            RoleManager<IdentityRole> roleManager,
-            IMailService mailService,
-            IConfiguration configuration
-            ) 
+        public AccountController(IAccountService accountService) 
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            //_roleManager = roleManager;
-            _mailService = mailService;
-            _configuration = configuration;
+            _accountService = accountService;
         }
 
         [HttpPost]
         [Route("ForgotPassword")]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest request)
         {
-            var user = await _userManager.FindByEmailAsync(request.Email);
-            if(user != null)
-            {
-                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                var clientUrl = _configuration["Endpoints:Client"];
-                var url = clientUrl + Url.Action(nameof(ResetPassword), new { token = token, email = user.Email });
-
-                var mailData = new MailData
-                {
-                    EmailToId = user.Email,
-                    EmailSubject = "Resetowanie hasła",
-                    EmailBody = url,
-                };
-
-                await _mailService.SendMailAsync(mailData);
-            }
+            await _accountService.ForgotPasswordAsync(request);
 
             return Ok(new SuccedResponse
             {
-                Message = "Link do resetowania hasła został wysłany."
+                Message = Messages.ResetPasswordLinkSend
             });
         }
 
@@ -62,32 +38,20 @@ namespace PromptHub2.Server.Controllers
         [Route("ResetPassword")]
         public async Task<IActionResult> ResetPassword(ResetPasswordRequest request)
         {
-            var user = await _userManager.FindByEmailAsync(request.Email);
-            if(user != null)
-            {
-                var result = await _userManager.ResetPasswordAsync(user, request.Token, request.Password);
-                if(result.Errors.Any()) 
-                {
-                    return StatusCode(
-                        StatusCodes.Status500InternalServerError,
-                        new ErrorResponse
-                        {
-                            Message = "Wystąpił problem podczas próby resetowania hasła.",
-                            Errors = result.Errors.ToDictionary(e => e.Code, e => new[] { e.Description })
-                        });
-                }
+            bool result = await _accountService.ResetPasswordAsync(request);
 
+            if(result)
+            {
                 return Ok(new SuccedResponse
                 {
-                    Message = "Hasło zostało zresetowane."
+                    Message = Messages.PasswordReseted
+
                 });
             }
 
             return BadRequest(new ErrorResponse
             {
-                Errors = new Dictionary<string, string[]> {
-                    { "url", new[] { "Link wygasł." } }
-                }
+                Message = Errors.LinkExpired
             });
         }
     }

@@ -1,4 +1,4 @@
-﻿namespace PromptHub2.Server.Models
+﻿namespace PromptHub2.Server.Models.Requests
 {
     public class EchoRequest
     {

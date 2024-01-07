@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Authorization;
 using PromptHub2.Server.Models;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using System.Linq;
+using PromptHub2.Server.Models.Responses;
+using PromptHub2.Server.Constants;
 
-namespace PromptHub2.Server.Services
+namespace PromptHub2.Server.Middlewares
 {
-    public class SampleAuthorizationMiddlewareResultHandler : IAuthorizationMiddlewareResultHandler
+    public class CustomMessageAuthorizationMiddlewareResultHandler : IAuthorizationMiddlewareResultHandler
     {
         private readonly AuthorizationMiddlewareResultHandler defaultHandler = new();
 
@@ -21,26 +23,28 @@ namespace PromptHub2.Server.Services
                 && authorizeResult.AuthorizationFailure.FailedRequirements.Any())
             {
                 context.Response.StatusCode = StatusCodes.Status403Forbidden;
+
                 await context.Response.WriteAsJsonAsync(new ErrorResponse
                 {
                     Errors = new Dictionary<string, string[]>
                     {
                         {
-                            "authorization", 
+                            "submit",
                             authorizeResult.AuthorizationFailure?.FailedRequirements
                                 .Select(failedRequirement =>
                                 {
                                     if (failedRequirement is RolesAuthorizationRequirement rolesRequirement)
                                     {
-                                        return $"Użytkownik nie posiada następujących uprawnień: {string.Join(", ", rolesRequirement.AllowedRoles)}";
+                                        return $"{Errors.UserDoesNotHaveRights} {string.Join(", ", rolesRequirement.AllowedRoles)}";
                                     }
 
                                     return failedRequirement.GetType().Name;
                                 })
-                                .ToArray() ?? Array.Empty<string>() 
+                                .ToArray() ?? Array.Empty<string>()
                         }
                     }
                 });
+
                 return;
             }
 
@@ -48,5 +52,5 @@ namespace PromptHub2.Server.Services
         }
     }
 
-    public class Show404Requirement : IAuthorizationRequirement { }
+    //public class Show404Requirement : IAuthorizationRequirement { }
 }

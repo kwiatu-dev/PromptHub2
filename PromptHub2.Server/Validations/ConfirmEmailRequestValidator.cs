@@ -1,5 +1,7 @@
 ﻿using FluentValidation;
-using PromptHub2.Server.Models;
+using PromptHub2.Server.Constants;
+using PromptHub2.Server.Models.Requests;
+using PromptHub2.Server.Validations.Extensions;
 
 namespace PromptHub2.Server.Validations
 {
@@ -7,12 +9,8 @@ namespace PromptHub2.Server.Validations
     {
         public ConfirmEmailRequestValidator() 
         {
-            RuleFor(x => x.Email)
-                .NotEmpty().WithMessage("Niepoprawny format adresu e-mail.")
-                .EmailAddress().WithMessage("Niepoprawny format adresu e-mail.");
-
-            RuleFor(x => x.Token)
-                .NotEmpty().WithMessage("Token nie został podany.");
+            RuleFor(x => x.Email).ValidEmail();
+            RuleFor(x => x.Token).ValidToken();
         }
     }
 }

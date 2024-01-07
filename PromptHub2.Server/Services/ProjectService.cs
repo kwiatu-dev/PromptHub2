@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PromptHub2.Server.Data;
-using PromptHub2.Server.Models;
+using PromptHub2.Server.Interfaces;
+using PromptHub2.Server.Models.Entites;
 
 namespace PromptHub2.Server.Services
 {

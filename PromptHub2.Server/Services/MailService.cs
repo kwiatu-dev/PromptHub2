@@ -2,7 +2,8 @@
 using Microsoft.Extensions.Options;
 using MimeKit;
 using PromptHub2.Server.Interfaces;
-using PromptHub2.Server.Models;
+using PromptHub2.Server.Models.Data;
+using PromptHub2.Server.Models.Settings;
 
 namespace PromptHub2.Server.Services
 {

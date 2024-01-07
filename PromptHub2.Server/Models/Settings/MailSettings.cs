@@ -1,4 +1,4 @@
-﻿namespace PromptHub2.Server
+﻿namespace PromptHub2.Server.Models.Settings
 {
     public class MailSettings
     {

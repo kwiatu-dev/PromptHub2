@@ -2,8 +2,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using PromptHub2.Server.Constants;
 using PromptHub2.Server.Interfaces;
 using PromptHub2.Server.Models;
+using PromptHub2.Server.Models.Requests;
+using PromptHub2.Server.Models.Responses;
 using PromptHub2.Server.Validations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -15,87 +18,28 @@ namespace PromptHub2.Server.Controllers
     [ApiController]
     public class AuthenticateController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
-        //private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly IMailService _mailService;
-        private readonly IConfiguration _configuration;
+        private readonly IAuthenticateService _authenticateService;
 
-        public AuthenticateController(
-            UserManager<IdentityUser> userManager, 
-            SignInManager<IdentityUser> signInManager,
-            RoleManager<IdentityRole> roleManager,
-            IMailService mailService,
-            IConfiguration configuration
-            ) 
+        public AuthenticateController(IAuthenticateService authenticateService) 
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            //_roleManager = roleManager;
-            _mailService = mailService;
-            _configuration = configuration;
+            _authenticateService = authenticateService;
         }
 
         [HttpPost]
         [Route("Login")]
         public async Task<IActionResult> Login(LoginRequest request)
         {
-            var user = await _userManager.FindByEmailAsync(request.Email);
-            if (user != null)
+            var result = await _authenticateService.LoginAsync(request);
+
+            if (result.IsSuccess)
             {
-                var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, true);
-                if (result.Succeeded)
-                {
-                    var userRoles = await _userManager.GetRolesAsync(user);
-
-                    var authClaims = new List<Claim>
-                    {
-                        new(ClaimTypes.NameIdentifier, user.Id),
-                        new(ClaimTypes.Email, request.Email),
-                        new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-                    };
-
-                    foreach (var role in userRoles)
-                    {
-                        authClaims.Add(new Claim(ClaimTypes.Role, role));
-                    }
-
-                    var token = CreateToken(authClaims);
-
-                    return Ok(new { 
-                        token = new JwtSecurityTokenHandler().WriteToken(token),
-                    });
-                }
-                else if(result.IsLockedOut)
-                {
-                    return StatusCode(
-                        StatusCodes.Status423Locked, 
-                        new ErrorResponse { 
-                            Errors = new Dictionary<string, string[]>
-                            {
-                                { "email", new[] { "Przeroczono limit prób logowania." } }
-                            }
-                        });
-                }
-                else if (result.IsNotAllowed)
-                {
-                    return BadRequest(
-                        new ErrorResponse
-                        {
-                            Errors = new Dictionary<string, string[]>
-                            {
-                                { "email", new[] { "Zweryfikuj adres email." } }
-                            }
-                        });
-                }
+                return Ok(new { token = result.Token });
             }
 
-            return Unauthorized(new ErrorResponse
+            return StatusCode(result.StatusCode, new ErrorResponse
             {
-                Errors = new Dictionary<string, string[]> 
-                {
-                    { "email", new[] { "Nieprawidłowy adres email lub hasło." } }
-                }
+                Message = result.Message,
+                Errors = result.Errors,
             });
         }
 
@@ -103,41 +47,20 @@ namespace PromptHub2.Server.Controllers
         [Route("Register")]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
-            var user = new IdentityUser
-            {
-                UserName = request.Email,
-                Email = request.Email
-            };
+            var result = await _authenticateService.RegisterAsync(request);
 
-            var result = await _userManager.CreateAsync(user, request.Password);
-            if (result.Errors.Any())
+            if (result.IsSuccess)
             {
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError, 
-                    new ErrorResponse { 
-                        Message = "Wystąpił problem podczas próby utworzenia użytkownika.",
-                        Errors = new Dictionary<string, string[]>
-                        {
-                            { "email", result.Errors.Select(e => e.Description).ToArray() }
-                        }
-                    });
+                return Ok(new SuccedResponse
+                {
+                    Message = result.Message
+                });
             }
 
-            var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var clientUrl = _configuration["Endpoints:Client"];
-            var confirmationLink = clientUrl + Url.Action(nameof(ConfirmEmail), new { token = confirmationToken, email = user.Email });
-
-            var mailData = new MailData
+            return StatusCode(result.StatusCode, new ErrorResponse
             {
-                EmailToId = user.Email,
-                EmailSubject = "Weryfikacja adresu email",
-                EmailBody = confirmationLink
-            };
-
-            await _mailService.SendMailAsync(mailData);
-
-            return Ok(new SuccedResponse { 
-                Message = "Użytkownik został pomyślnie utworzony."
+                Message = result.Message,
+                Errors = result.Errors,
             });
         }
 
@@ -146,51 +69,20 @@ namespace PromptHub2.Server.Controllers
         [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> ConfirmEmail(ConfirmEmailRequest request)
         {
-            var user = await _userManager.FindByEmailAsync(request.Email);
-            if (user != null)
-            {
-                var result = await _userManager.ConfirmEmailAsync(user, request.Token);
+            var result = await _authenticateService.ConfirmEmailAsync(request);
 
-                if(result.Errors.Any())
+            if (result.IsSuccess)
+            {
+                return Ok(new SuccedResponse
                 {
-                    return BadRequest(
-                        new ErrorResponse
-                        {
-                            Message = "Nie udało się zweryfikować adresu email.",
-                            Errors = result.Errors.ToDictionary(e => e.Code, e => new[] { e.Description })
-                        });
-                }
-                else
-                {
-                    return Ok(new SuccedResponse
-                    {
-                        Message = "Adres email został zwerfikowany pomyślnie."
-                    });
-                }
+                    Message = result.Message
+                });
             }
 
-            return BadRequest(new ErrorResponse
+            return StatusCode(result.StatusCode, new ErrorResponse
             {
-                Errors = new Dictionary<string, string[]> { 
-                    { "url", new[] { "Link wygasł." } }
-                }
+                Message = result.Message,
             });
-        }
-
-        private JwtSecurityToken CreateToken(List<Claim> authClaims)
-        {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"] ?? ""));
-
-            var token = new JwtSecurityToken(
-                claims: authClaims,
-                notBefore: DateTime.UtcNow,
-                issuer: _configuration["JWT:ValidIssuer"],
-                audience: _configuration["JWT:ValidAudience"],
-                expires: DateTime.Now.AddDays(7),
-                signingCredentials: new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature)
-                );
-
-            return token;
         }
     }
 }

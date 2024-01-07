@@ -1,18 +1,14 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using PromptHub2.Server.Models;
+using PromptHub2.Server.Models.Entites;
 using System.Text.Json;
 
 namespace PromptHub2.Server.Data
 {
     public class AppDbContext : IdentityDbContext
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-        {
-
-        }
-
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
         public DbSet<Project> Projects { get; set; }
         public DbSet<Prompt> Prompts { get; set; }
 

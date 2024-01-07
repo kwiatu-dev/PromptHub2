@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using PromptHub2.Server.Infrastructure;
 using PromptHub2.Server.Models;
+using PromptHub2.Server.Models.Requests;
+using PromptHub2.Server.Models.Responses;
 using System.Net;
 
 namespace PromptHub2.Server.Controllers

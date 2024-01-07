@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PromptHub2.Server.Interfaces;
-using PromptHub2.Server.Models;
+using PromptHub2.Server.Models.Data;
 using PromptHub2.Server.Services;
 
 namespace PromptHub2.Server.Controllers

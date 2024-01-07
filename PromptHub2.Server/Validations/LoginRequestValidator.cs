@@ -1,5 +1,7 @@
 ﻿using FluentValidation;
-using PromptHub2.Server.Models;
+using PromptHub2.Server.Constants;
+using PromptHub2.Server.Models.Requests;
+using PromptHub2.Server.Validations.Extensions;
 
 namespace PromptHub2.Server.Validations
 {
@@ -7,17 +9,8 @@ namespace PromptHub2.Server.Validations
     {
         public LoginRequestValidator() 
         {
-            RuleFor(x => x.Email)
-                .NotEmpty().WithMessage("Niepoprawny format adresu e-mail.")
-                .EmailAddress().WithMessage("Niepoprawny format adresu e-mail.");
-
-            RuleFor(x => x.Password)
-                .NotEmpty().WithMessage("Hasło jest wymagane.")
-                .MinimumLength(8).WithMessage("Hasło musi mieć co najmniej 8 znaków.")
-                .Matches("[A-Z]").WithMessage("Hasło musi zawierać co najmniej jedną wielką literę.")
-                .Matches("[a-z]").WithMessage("Hasło musi zawierać co najmniej jedną małą literę.")
-                .Matches("[0-9]").WithMessage("Hasło musi zawierać co najmniej jedną cyfrę.")
-                .Matches("[^a-zA-Z0-9]").WithMessage("Hasło musi zawierać co najmniej jeden znak specjalny.");
+            RuleFor(x => x.Email).ValidEmail();
+            RuleFor(x => x.Password).ValidPassword();
         }
     }
 }

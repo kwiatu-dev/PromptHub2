@@ -1,8 +1,8 @@
 ﻿using Bogus.DataSets;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using PromptHub2.Server.Infrastructure;
-using PromptHub2.Server.Models;
+using PromptHub2.Server.Constants;
+using PromptHub2.Server.Models.Entites;
 using System.Runtime.CompilerServices;
 
 namespace PromptHub2.Server.Data

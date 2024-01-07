@@ -1,4 +1,4 @@
-﻿using PromptHub2.Server.Models;
+﻿using PromptHub2.Server.Models.Data;
 
 namespace PromptHub2.Server.Interfaces
 {
