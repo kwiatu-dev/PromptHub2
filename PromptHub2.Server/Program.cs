@@ -39,6 +39,10 @@ builder.Services.AddIdentityConfiguration(configuration);
 builder.Services.AddAuthenticationConfiguration(configuration);
 builder.Services.AddAuthorizationConfiguration(configuration);
 
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "X-XSRF-TOKEN";
+});
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
@@ -48,7 +52,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 builder.Services.AddFluentValidationAutoValidation()
     .AddValidatorsFromAssemblyContaining<IAssemblyMarker>();
 
-builder.Services.AddControllers(options =>
+builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add<ValidateModelStateFilter>();
 });

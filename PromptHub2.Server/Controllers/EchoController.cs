@@ -9,6 +9,7 @@ using System.Net;
 namespace PromptHub2.Server.Controllers
 {
     [Authorize(Roles = "admin")]
+    [ValidateAntiForgeryToken]
     [ApiController]
     public class EchoController : ControllerBase
     {
