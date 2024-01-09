@@ -14,6 +14,8 @@ namespace PromptHub2.Server.Configuration.Authorization
                 options.AddPolicy(Roles.AdminPolicy,
                     policy => policy.RequireClaim(ClaimTypes.Role, Roles.Administrator));
             });
+
+            services.AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
         }
     }
 }

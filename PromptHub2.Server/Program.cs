@@ -23,41 +23,33 @@ using PromptHub2.Server.Configuration.Cors;
 using PromptHub2.Server.Configuration.Data;
 using PromptHub2.Server.Configuration.Authorization;
 using PromptHub2.Server.Configuration.Authentication;
+using PromptHub2.Server.Configuration.Extensions;
+using PromptHub2.Server.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configuration = builder.Configuration;
 
 builder.Services.AddSingleton<SoftDeleteInterceptor>();
 builder.Services.AddSingleton<AuditableEntitiesInterceptor>();
+builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, ErrorHandlerAuthorizationMiddleware>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddTransient<IMailService, MailService>();
 
 builder.Services.AddCorsConfiguration(configuration);
 builder.Services.AddDbContextConfiguration(configuration);
 builder.Services.AddIdentityConfiguration(configuration);
 builder.Services.AddAuthenticationConfiguration(configuration);
 builder.Services.AddAuthorizationConfiguration(configuration);
-
-builder.Services.AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
-
-builder.Services.Configure<ApiBehaviorOptions>(options =>
-{
-    options.SuppressModelStateInvalidFilter = true;
-});
-
-builder.Services.AddFluentValidationAutoValidation()
-    .AddValidatorsFromAssemblyContaining<IAssemblyMarker>();
+builder.Services.AddExtensionsConfiguration(configuration);
+builder.Services.AddAppConfiguration(configuration);
 
 builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add<ValidateModelStateFilter>();
     options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
 });
-
-builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
-builder.Services.AddTransient<IMailService, MailService>();
-builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, ErrorHandlerAuthorizationMiddleware>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

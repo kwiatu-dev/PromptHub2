@@ -12,7 +12,7 @@ namespace PromptHub2.Server.Helpers
             return ModelState
                 .Where(ms => ms.Value?.Errors != null && ms.Value.Errors.Any())
                 .ToDictionary(
-                    ms => ms.Key,
+                    ms => ms.Key.ToLower(),
                     ms => ms.Value?.Errors.Select(e => e.ErrorMessage).ToArray() ?? Array.Empty<string>()
                 );
         }

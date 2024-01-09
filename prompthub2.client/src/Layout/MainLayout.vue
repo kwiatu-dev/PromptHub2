@@ -1,7 +1,7 @@
 <template>
   <div>
     <HeaderSection />
-    <main class="container mx-auto py-5 px-4">
+    <main class="max-w-screen-xl mx-auto p-4">
       <slot />
     </main>
   </div>
