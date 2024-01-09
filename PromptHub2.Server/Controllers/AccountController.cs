@@ -23,6 +23,7 @@ namespace PromptHub2.Server.Controllers
         }
 
         [HttpPost]
+        [IgnoreAntiforgeryToken]
         [Route("ForgotPassword")]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest request)
         {
@@ -35,6 +36,7 @@ namespace PromptHub2.Server.Controllers
         }
 
         [HttpPost]
+        [IgnoreAntiforgeryToken]
         [Route("ResetPassword")]
         public async Task<IActionResult> ResetPassword(ResetPasswordRequest request)
         {

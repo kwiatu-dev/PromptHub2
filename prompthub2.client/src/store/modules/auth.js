@@ -1,14 +1,14 @@
 import axios from 'axios'
-import Cookies from 'universal-cookie'
 import parseJwt from '@/helpers/parseJwt.js'
-import { ROLE_SCHEMA, EMAIL_SCHEMA } from '@/data/schemas'
-const cookies = new Cookies()
+import { ROLE_SCHEMA, EMAIL_SCHEMA } from '@/constants/schemas'
+import { RemoveJWTCookie, SetJWTCookie } from '@/helpers/tokens'
 
 const state = () => ({
   user: null,
 })
 const getters = {
   isAuthenticated: state => !!state.user,
+  isAdmin: state => state.user?.role === 'admin',
   StateUser: state => state.user,
 }
 const actions = {
@@ -29,11 +29,11 @@ const actions = {
       const tokenString = response.data.token 
       const token = parseJwt(tokenString)
       const expires = new Date(token.exp * 1000)
-      cookies.set('token', tokenString, { expires })
+      SetJWTCookie(tokenString, { expires })
 
-      await commit('setUser', {
+      await commit('SetUser', {
         email: token[EMAIL_SCHEMA],
-        token: response.data.token,
+        token: tokenString,
         role: token[ROLE_SCHEMA] ?? null,
       })
 
@@ -44,7 +44,7 @@ const actions = {
     }
   },
   async LogOut({commit}){
-    cookies.remove('token')
+    RemoveJWTCookie()
     commit('LogOut')
   },
   async ConfirmEmail(_, payload){
@@ -59,7 +59,7 @@ const actions = {
   },
 }
 const mutations = {
-  setUser(state, user){
+  SetUser(state, user){
     state.user = user
   },
   LogOut(state){

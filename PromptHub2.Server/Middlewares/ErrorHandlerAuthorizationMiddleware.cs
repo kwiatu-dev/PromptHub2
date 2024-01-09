@@ -5,10 +5,11 @@ using Microsoft.AspNetCore.Authorization.Infrastructure;
 using System.Linq;
 using PromptHub2.Server.Models.Responses;
 using PromptHub2.Server.Constants;
+using PromptHub2.Server.Helpers;
 
 namespace PromptHub2.Server.Middlewares
 {
-    public class CustomMessageAuthorizationMiddlewareResultHandler : IAuthorizationMiddlewareResultHandler
+    public class ErrorHandlerAuthorizationMiddleware : IAuthorizationMiddlewareResultHandler
     {
         private readonly AuthorizationMiddlewareResultHandler defaultHandler = new();
 
@@ -26,23 +27,7 @@ namespace PromptHub2.Server.Middlewares
 
                 await context.Response.WriteAsJsonAsync(new ErrorResponse
                 {
-                    Errors = new Dictionary<string, string[]>
-                    {
-                        {
-                            "submit",
-                            authorizeResult.AuthorizationFailure?.FailedRequirements
-                                .Select(failedRequirement =>
-                                {
-                                    if (failedRequirement is RolesAuthorizationRequirement rolesRequirement)
-                                    {
-                                        return $"{Errors.UserDoesNotHaveRights} {string.Join(", ", rolesRequirement.AllowedRoles)}";
-                                    }
-
-                                    return failedRequirement.GetType().Name;
-                                })
-                                .ToArray() ?? Array.Empty<string>()
-                        }
-                    }
+                    Errors = ExtractErrors.ExtractFailedRequirements(authorizeResult.AuthorizationFailure)
                 });
 
                 return;
@@ -51,6 +36,4 @@ namespace PromptHub2.Server.Middlewares
             await defaultHandler.HandleAsync(next, context, policy, authorizeResult);
         }
     }
-
-    //public class Show404Requirement : IAuthorizationRequirement { }
 }

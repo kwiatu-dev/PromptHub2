@@ -15,7 +15,7 @@ namespace PromptHub2.Server.Middlewares
             {
                 Errors = new Dictionary<string, string[]>
                 {
-                    { "submit", new[] { Errors.AccessDenied } }
+                    { Form.OtherErrorsFieldName, new[] { Errors.AccessDenied } }
                 }
             });
         }

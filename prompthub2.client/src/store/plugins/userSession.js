@@ -1,18 +1,15 @@
-import parseJwt from '@/helpers/parseJwt.js'
-import Cookies from 'universal-cookie'
-import { ROLE_SCHEMA, EMAIL_SCHEMA } from '@/data/schemas'
-const cookies = new Cookies()
+import { ROLE_SCHEMA, EMAIL_SCHEMA } from '@/constants/schemas'
+import { GetJWTFromCookie, GetJWTFromCookieAndParse } from '@/helpers/tokens'
 
 export const userSessionPlugin = (store) => {
-  const tokenString = cookies.get('token')
+  const tokenString = GetJWTFromCookie()
+  const token = GetJWTFromCookieAndParse()
 
-  if(tokenString){
-    const token = parseJwt(tokenString)
-
-    store.state.auth.user = {
+  if(token){
+    store.commit('SetUser', {
       email: token[EMAIL_SCHEMA],
       token: tokenString,
       role: token[ROLE_SCHEMA] ?? null,
-    }
+    })
   }
 }

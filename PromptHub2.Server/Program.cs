@@ -39,10 +39,7 @@ builder.Services.AddIdentityConfiguration(configuration);
 builder.Services.AddAuthenticationConfiguration(configuration);
 builder.Services.AddAuthorizationConfiguration(configuration);
 
-builder.Services.AddAntiforgery(options =>
-{
-    options.HeaderName = "X-XSRF-TOKEN";
-});
+builder.Services.AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
@@ -55,11 +52,12 @@ builder.Services.AddFluentValidationAutoValidation()
 builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add<ValidateModelStateFilter>();
+    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
 });
 
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 builder.Services.AddTransient<IMailService, MailService>();
-builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, CustomMessageAuthorizationMiddlewareResultHandler>();
+builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, ErrorHandlerAuthorizationMiddleware>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

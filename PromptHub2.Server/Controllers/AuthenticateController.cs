@@ -26,6 +26,7 @@ namespace PromptHub2.Server.Controllers
         }
 
         [HttpPost]
+        [IgnoreAntiforgeryToken]
         [Route("Login")]
         public async Task<IActionResult> Login(LoginRequest request)
         {
@@ -44,6 +45,7 @@ namespace PromptHub2.Server.Controllers
         }
 
         [HttpPost]
+        [IgnoreAntiforgeryToken]
         [Route("Register")]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
@@ -66,6 +68,7 @@ namespace PromptHub2.Server.Controllers
 
         [HttpPost]
         [Route("ConfirmEmail")]
+        [IgnoreAntiforgeryToken]
         [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> ConfirmEmail(ConfirmEmailRequest request)
         {

@@ -1,17 +1,20 @@
 import router from '@/router/router.js'
 import store from '@/store'
 import axios from 'axios'
-import Cookies from 'universal-cookie'
-const cookies = new Cookies()
+import { GetJWTFromCookie } from '@/helpers/tokens'
 
 axios.defaults.withCredentials = true
 axios.defaults.baseURL = import.meta.env.VITE_ENDPOINT_URL
 
-axios.interceptors.request.use(function(config){
-  const tokenString = cookies.get('token')
+axios.interceptors.request.use(async function(config){
+  const isAuthenticated = store.getters.isAuthenticated
 
-  if(tokenString){
-    config.headers.Authorization = `Bearer ${tokenString}`
+  if(isAuthenticated){
+    config.headers.Authorization = `Bearer ${GetJWTFromCookie()}`
+  }
+
+  if (store.getters.StateAntiForgeryToken) {
+    config.headers['X-XSRF-TOKEN'] = store.getters.StateAntiForgeryToken
   }
 
   return config
@@ -30,3 +33,5 @@ axios.interceptors.response.use(undefined, function(error){
 
   return Promise.reject(error)
 })
+
+export default axios

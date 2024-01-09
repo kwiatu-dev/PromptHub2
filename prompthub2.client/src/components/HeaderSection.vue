@@ -1,10 +1,11 @@
 <template>
   <header class="text-gray-600 body-font border-solid border-b-2 border-gray-200">
-    <div class="container mx-auto flex flex-wrap py-5 justify-between flex-col md:flex-row items-center px-4 md:px-0">
+    <div class="container mx-auto flex flex-wrap py-5 justify-between flex-col md:flex-row items-center px-4">
       <div class="flex flex-row gap-4 items-center">
         <RouterLink :to="{name: 'home'}" class="title-font font-mediumtext-gray-900 text-2xl">PromptHub</RouterLink>
         <nav class="flex flex-wrap justify-start items-center text-base gap-2">
           <RouterLink :to="{name: 'projects'}">Projects</RouterLink>
+          <RouterLink v-if="isAdmin" :to="{name: 'admin'}">Admin</RouterLink>
         </nav>
       </div>
       <div v-if="!isLoggedIn" class="flex flex-row gap-4">
@@ -35,6 +36,7 @@ import { computed } from 'vue'
 const router = useRouter()
 const store = useStore()
 const isLoggedIn = computed(() => store.getters.isAuthenticated)
+const isAdmin = computed(() => store.getters.isAdmin)
 
 const logout = async () => {
   await store.dispatch('LogOut')
