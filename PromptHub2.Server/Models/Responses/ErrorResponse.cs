@@ -1,9 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using PromptHub2.Server;
-
-namespace PromptHub2.Server.Models.Responses
+﻿namespace PromptHub2.Server.Models.Responses
 {
     public class ErrorResponse
     {

@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using PromptHub2.Server.Data.Seed;
 using PromptHub2.Server.Models.Entites;
+using System.Reflection;
 using System.Text.Json;
 
 namespace PromptHub2.Server.Data
@@ -12,27 +14,11 @@ namespace PromptHub2.Server.Data
         public DbSet<Project> Projects { get; set; }
         public DbSet<Prompt> Prompts { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<Prompt>()
-                .HasQueryFilter(prompt => prompt.IsDeleted == false);
-
-            modelBuilder.Entity<Project>()
-                .HasQueryFilter(project => project.IsDeleted == false);
-
-            modelBuilder.Entity<Prompt>()
-                .Property(prompt => prompt.Messages)
-                .HasConversion(
-                    v => v == null ? null : JsonSerializer.Serialize(v, new JsonSerializerOptions()),
-                    v => v == null ? new List<Message>() : JsonSerializer.Deserialize<List<Message>>(v, new JsonSerializerOptions()) ?? new List<Message>())
-            .Metadata.SetValueComparer(new ValueComparer<List<Message>>(
-                (c1, c2) => (c1 == null && c2 == null) || (c1 != null && c2 != null && c1.SequenceEqual(c2)),
-                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
-                c => (List<Message>)c.ToList()));
-
-            DbInitializer.Initialize(modelBuilder);
+            base.OnModelCreating(builder);
+            builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+            builder.Seed();
         }
     }
 }

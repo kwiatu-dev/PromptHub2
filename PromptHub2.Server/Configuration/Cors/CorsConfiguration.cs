@@ -1,6 +1,4 @@
-﻿using PromptHub2.Server.Constants;
-
-namespace PromptHub2.Server.Configuration.Cors
+﻿namespace PromptHub2.Server.Configuration.Cors
 {
     public static class CorsConfiguration
     {

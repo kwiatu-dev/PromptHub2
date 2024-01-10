@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PromptHub2.Server.Data;
+using PromptHub2.Server.Data.Interceptor;
 
 namespace PromptHub2.Server.Configuration.Data
 {

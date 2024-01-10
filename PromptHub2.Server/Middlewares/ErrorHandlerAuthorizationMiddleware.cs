@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization.Policy;
 using Microsoft.AspNetCore.Authorization;
-using PromptHub2.Server.Models;
-using Microsoft.AspNetCore.Authorization.Infrastructure;
-using System.Linq;
 using PromptHub2.Server.Models.Responses;
-using PromptHub2.Server.Constants;
 using PromptHub2.Server.Helpers;
 
 namespace PromptHub2.Server.Middlewares

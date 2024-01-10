@@ -10,6 +10,7 @@ axios.interceptors.request.use(async function(config){
   const isAuthenticated = store.getters.isAuthenticated
 
   if(isAuthenticated){
+    console.log(GetJWTFromCookie())
     config.headers.Authorization = `Bearer ${GetJWTFromCookie()}`
   }
 

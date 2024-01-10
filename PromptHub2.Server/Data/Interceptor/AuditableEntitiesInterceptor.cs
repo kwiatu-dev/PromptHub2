@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using PromptHub2.Server.Interfaces;
 
-namespace PromptHub2.Server.Data
+namespace PromptHub2.Server.Data.Interceptor
 {
     public class AuditableEntitiesInterceptor : SaveChangesInterceptor
     {

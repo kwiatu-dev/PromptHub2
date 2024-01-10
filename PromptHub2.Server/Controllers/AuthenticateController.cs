@@ -1,16 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using PromptHub2.Server.Constants;
+﻿using Microsoft.AspNetCore.Mvc;
 using PromptHub2.Server.Interfaces;
-using PromptHub2.Server.Models;
 using PromptHub2.Server.Models.Requests;
 using PromptHub2.Server.Models.Responses;
-using PromptHub2.Server.Validations;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace PromptHub2.Server.Controllers
 {

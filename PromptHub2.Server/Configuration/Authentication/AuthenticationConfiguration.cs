@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using PromptHub2.Server.Middlewares;
-using PromptHub2.Server.Models.Responses;
-using System.Security.Claims;
 using System.Text;
 
 namespace PromptHub2.Server.Configuration.Authentication

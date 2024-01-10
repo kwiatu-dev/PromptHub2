@@ -1,30 +1,17 @@
-using FluentValidation;
-using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using PromptHub2.Server.Common;
-using PromptHub2.Server.Data;
 using PromptHub2.Server.Interfaces;
 using PromptHub2.Server.Middlewares;
 using PromptHub2.Server.Middlewares.Filters;
-using PromptHub2.Server.Models;
-using PromptHub2.Server.Models.Responses;
-using PromptHub2.Server.Models.Settings;
 using PromptHub2.Server.Services;
-using System.Security.Claims;
-using System.Text;
 using PromptHub2.Server.Constants;
-using Microsoft.VisualBasic;
 using PromptHub2.Server.Configuration.Cors;
 using PromptHub2.Server.Configuration.Data;
 using PromptHub2.Server.Configuration.Authorization;
 using PromptHub2.Server.Configuration.Authentication;
 using PromptHub2.Server.Configuration.Extensions;
 using PromptHub2.Server.Configuration;
+using PromptHub2.Server.Data.Interceptor;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configuration = builder.Configuration;
@@ -47,6 +34,7 @@ builder.Services.AddAppConfiguration(configuration);
 
 builder.Services.AddControllersWithViews(options =>
 {
+    options.AllowEmptyInputInBodyModelBinding = true;
     options.Filters.Add<ValidateModelStateFilter>();
     options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
 });

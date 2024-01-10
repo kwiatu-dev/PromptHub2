@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using PromptHub2.Server.Models.Requests;
+﻿using PromptHub2.Server.Models.Requests;
 
 namespace PromptHub2.Server.Interfaces
 {

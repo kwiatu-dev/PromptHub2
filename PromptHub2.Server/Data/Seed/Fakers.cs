@@ -3,7 +3,7 @@ using Bogus.Extensions;
 using Microsoft.AspNetCore.Identity;
 using PromptHub2.Server.Models.Entites;
 
-namespace PromptHub2.Server.Data
+namespace PromptHub2.Server.Data.Seed
 {
     public class Fakers
     {
@@ -16,7 +16,7 @@ namespace PromptHub2.Server.Data
                 .RuleFor(u => u.Email, (f, u) => u.UserName)
                 .RuleFor(u => u.NormalizedEmail, (f, u) => u.Email?.ToUpper())
                 .RuleFor(u => u.EmailConfirmed, f => f.Random.Bool())
-                .RuleFor(u => u.PasswordHash, (f, u) => new PasswordHasher<IdentityUser>().HashPassword(u, "Password@1"));
+                .RuleFor(u => u.PasswordHash, (f, u) => new PasswordHasher<IdentityUser>().HashPassword(u, Constants.Users.PasswordDefault));
 
             return userFaker;
         }

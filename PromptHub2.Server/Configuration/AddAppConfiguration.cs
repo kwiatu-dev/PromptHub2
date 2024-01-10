@@ -1,6 +1,4 @@
-﻿using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Mvc;
-using PromptHub2.Server.Common;
+﻿using Microsoft.AspNetCore.Mvc;
 using PromptHub2.Server.Models.Settings;
 
 namespace PromptHub2.Server.Configuration

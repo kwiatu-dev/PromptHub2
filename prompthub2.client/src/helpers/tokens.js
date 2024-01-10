@@ -13,7 +13,7 @@ export const GetJWTFromCookieAndParse = () => {
 }
 
 export const SetJWTCookie = (token, options) => {
-  cookies.set(JWT_COOKIE_TOKEN, token, { ...options })
+  cookies.set(JWT_COOKIE_TOKEN, token, options)
 }
 
 export const RemoveJWTCookie = () => {

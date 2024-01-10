@@ -1,17 +1,15 @@
-﻿using Bogus.DataSets;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PromptHub2.Server.Constants;
 using PromptHub2.Server.Models.Entites;
-using System.Runtime.CompilerServices;
 
-namespace PromptHub2.Server.Data
+namespace PromptHub2.Server.Data.Seed
 {
-    public static class DbInitializer
+    public static class DatabaseSeeder
     {
-        public static void Initialize(ModelBuilder builder)
+        public static void Seed(this ModelBuilder builder)
         {
-            var roles = new List<IdentityRole>() { 
+            var roles = new List<IdentityRole>() {
                 new() { Id = Guid.NewGuid().ToString(), Name = Roles.Administrator }
             };
 
