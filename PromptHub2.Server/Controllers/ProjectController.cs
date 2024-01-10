@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using PromptHub2.Server.Constants;
 using PromptHub2.Server.Interfaces;
 using PromptHub2.Server.Models.Entites;
+using PromptHub2.Server.Models.Requests;
 using PromptHub2.Server.Models.Responses;
-using System.Security.Claims;
 
 namespace PromptHub2.Server.Controllers
 {
@@ -14,30 +12,31 @@ namespace PromptHub2.Server.Controllers
     public class ProjectController : ControllerBase
     {
         private readonly IProjectService _projectService;
-        private readonly UserManager<IdentityUser> _userManager;
         public ProjectController(
-            IProjectService projectService, 
-            UserManager<IdentityUser> userManager) 
+            IProjectService projectService) 
         {
             _projectService = projectService;
-            _userManager = userManager;
         }
 
         [Route("/projects")]
         [HttpGet]
         public async Task<ActionResult<List<Project>>> GetAllProjects()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = await _userManager.FindByIdAsync(userId ?? "");
+            return await _projectService.GetAllProjectsAsync();
+        }
 
-            if (user != null)
+        [Route("/projects")]
+        [HttpPost]
+        public async Task<ActionResult<Project>> CreateProject(CreateProjectRequest request)
+        {
+            var result = await _projectService.CreateProjectAsync(request);
+
+            if(result != null)
             {
-                return await _projectService.GetAllProjectsAsync(user);
+                return Created(nameof(GetAllProjects), result);
             }
 
-            return BadRequest(new ErrorResponse {
-                Message = Errors.UserNotExistOrUnauthorized,
-            });
+            return BadRequest(new ErrorResponse());
         }
     }
 }

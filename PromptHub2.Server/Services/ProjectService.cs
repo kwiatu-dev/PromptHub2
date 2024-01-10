@@ -1,34 +1,61 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PromptHub2.Server.Data;
 using PromptHub2.Server.Interfaces;
 using PromptHub2.Server.Models.Entites;
+using PromptHub2.Server.Models.Requests;
 
 namespace PromptHub2.Server.Services
 {
     public class ProjectService : IProjectService
     {
-        private readonly AppDbContext _context;
+        private readonly IUserService _userService;
+        private readonly AppDbContext _dbContext;
 
-        public ProjectService(AppDbContext context)
+        public ProjectService(
+            IUserService userService,
+            AppDbContext dbContext)
         {
-            _context = context;
+            _userService = userService;
+            _dbContext = dbContext;
         }
 
-        public async Task<List<Project>> GetAllProjectsAsync(IdentityUser user)
+        public async Task<List<Project>> GetAllProjectsAsync()
         {
-            var projects = await 
-                _context.Projects
+            var user = await _userService.GetCurrentUserAsync();
+
+            if(user != null)
+            {
+                return await _dbContext.Projects
                     .Where(p => p.CreatedById == user.Id)
                     .Include(p => p.Prompts)
                     .ToListAsync();
+            }
 
-            return projects;
+            return new List<Project>();
         }
 
-        Task<List<Project>> IProjectService.AddProjectAsync(Project project)
+        public async Task<Project?> CreateProjectAsync(CreateProjectRequest request)
         {
-            throw new NotImplementedException();
+            var user = await _userService.GetCurrentUserAsync();
+
+            if (user != null)
+            {
+                Project newProject = new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = request.Name,
+                    Description = request.Description,
+                    CreatedById = user.Id,
+                    UpdatedById = user.Id,
+                };
+
+                var projectEntry = _dbContext.Projects.Add(newProject);
+                await _dbContext.SaveChangesAsync();
+
+                return projectEntry.Entity;
+            }
+
+            return null;
         }
 
         Task<Project> IProjectService.DeleteProjectAsync(string guid)
@@ -36,7 +63,7 @@ namespace PromptHub2.Server.Services
             throw new NotImplementedException();
         }
 
-        Task<List<Project>> IProjectService.GetProjectByIdAsync(string guid)
+        Task<Project> IProjectService.GetProjectByIdAsync(string guid)
         {
             throw new NotImplementedException();
         }

@@ -21,6 +21,7 @@ builder.Services.AddSingleton<AuditableEntitiesInterceptor>();
 builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, ErrorHandlerAuthorizationMiddleware>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddTransient<IMailService, MailService>();
 
@@ -31,6 +32,7 @@ builder.Services.AddAuthenticationConfiguration(configuration);
 builder.Services.AddAuthorizationConfiguration(configuration);
 builder.Services.AddExtensionsConfiguration(configuration);
 builder.Services.AddAppConfiguration(configuration);
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllersWithViews(options =>
 {

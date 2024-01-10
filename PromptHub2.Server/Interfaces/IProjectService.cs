@@ -1,13 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity;
-using PromptHub2.Server.Models.Entites;
+﻿using PromptHub2.Server.Models.Entites;
+using PromptHub2.Server.Models.Requests;
 
 namespace PromptHub2.Server.Interfaces
 {
     public interface IProjectService
     {
-        Task<List<Project>> GetAllProjectsAsync(IdentityUser user);
-        Task<List<Project>> GetProjectByIdAsync(string guid);
-        Task<List<Project>> AddProjectAsync(Project project);
+        Task<List<Project>> GetAllProjectsAsync();
+        Task<Project> GetProjectByIdAsync(string guid);
+        Task<Project?> CreateProjectAsync(CreateProjectRequest request);
         Task<Project> UpdateProjectAsync(string guid, Project request);
         Task<Project> DeleteProjectAsync(string guid);
 

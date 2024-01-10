@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using PromptHub2.Server.Data.Seed;
 using PromptHub2.Server.Models.Entites;
 using System.Reflection;
-using System.Text.Json;
 
 namespace PromptHub2.Server.Data
 {
