@@ -29,7 +29,7 @@
 <script setup>
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive } from 'vue'
 import FormError from '@/components/FormError.vue'
 import FormMessage from '@/components/FormMessage.vue'
 

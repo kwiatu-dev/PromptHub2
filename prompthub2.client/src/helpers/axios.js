@@ -10,11 +10,10 @@ axios.interceptors.request.use(async function(config){
   const isAuthenticated = store.getters.isAuthenticated
 
   if(isAuthenticated){
-    console.log(GetJWTFromCookie())
     config.headers.Authorization = `Bearer ${GetJWTFromCookie()}`
   }
 
-  if (store.getters.StateAntiForgeryToken) {
+  if(store.getters.StateAntiForgeryToken){
     config.headers['X-XSRF-TOKEN'] = store.getters.StateAntiForgeryToken
   }
 
@@ -24,8 +23,8 @@ axios.interceptors.request.use(async function(config){
 axios.interceptors.response.use(undefined, function(error){
   if (error) {
     const originalRequest = error.config
-    if (error.response.status === 401 && !originalRequest._retry) {
-    
+
+    if(error.response.status === 401 && !originalRequest._retry){
       originalRequest._retry = true
       store.dispatch('LogOut')
       router.push({ name: 'login' })

@@ -2,6 +2,7 @@
 {
     public static class Errors
     {
+        //Authenticate && Account
         public const string ResetPasswordError = "There was a problem when trying to reset the password.";
         public const string LinkExpired = "The link has expired.";
         public const string LoginAttemptsExceeded = "The limit of login attempts has been exceeded.";

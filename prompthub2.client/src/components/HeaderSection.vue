@@ -71,15 +71,9 @@
 
 <script setup>
 import { useStore } from 'vuex'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { ref, computed } from 'vue'
 
-// import { library } from '@fortawesome/fontawesome-svg-core'
-// import { faStar } from '@fortawesome/free-solid-svg-icons'
-
-// library.add(faStar)
-
-const route = useRoute()
 const router = useRouter()
 const store = useStore()
 const user = computed(() => store.getters.StateUser)
