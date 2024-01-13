@@ -4,14 +4,14 @@ using PromptHub2.Server.Interfaces;
 using PromptHub2.Server.Models.Entites;
 using PromptHub2.Server.Models.Requests;
 
-namespace PromptHub2.Server.Services
+namespace PromptHub2.Server.Repositories
 {
-    public class ProjectService : IProjectService
+    public class ProjectRepository : IProjectService
     {
         private readonly IUserService _userService;
         private readonly AppDbContext _dbContext;
 
-        public ProjectService(
+        public ProjectRepository(
             IUserService userService,
             AppDbContext dbContext)
         {
@@ -23,7 +23,7 @@ namespace PromptHub2.Server.Services
         {
             var user = await _userService.GetCurrentUserAsync();
 
-            if(user != null)
+            if (user != null)
             {
                 return await _dbContext.Projects
                     .Where(p => p.CreatedById == user.Id)

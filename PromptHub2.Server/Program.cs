@@ -12,6 +12,7 @@ using PromptHub2.Server.Configuration.Authentication;
 using PromptHub2.Server.Configuration.Extensions;
 using PromptHub2.Server.Configuration;
 using PromptHub2.Server.Data.Interceptor;
+using PromptHub2.Server.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configuration = builder.Configuration;
@@ -22,7 +23,7 @@ builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, ErrorHandle
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<IProjectService, ProjectRepository>();
 builder.Services.AddTransient<IMailService, MailService>();
 
 builder.Services.AddCorsConfiguration(configuration);
