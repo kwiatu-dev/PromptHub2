@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using PromptHub2.Server.Data;
 using PromptHub2.Server.Interfaces;
 using PromptHub2.Server.Models.Entites;
@@ -6,7 +8,7 @@ using PromptHub2.Server.Models.Requests;
 
 namespace PromptHub2.Server.Repositories
 {
-    public class ProjectRepository : IProjectService
+    public class ProjectRepository : IProjectRepository
     {
         private readonly IUserService _userService;
         private readonly AppDbContext _dbContext;
@@ -19,13 +21,14 @@ namespace PromptHub2.Server.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<List<Project>> GetAllProjectsAsync()
+        public async Task<List<Project>> GetAllAsync()
         {
-            var user = await _userService.GetCurrentUserAsync();
+            var user = await _userService.GetAuthenticatedUserAsync();
 
             if (user != null)
             {
                 return await _dbContext.Projects
+                    .AsNoTracking()
                     .Where(p => p.CreatedById == user.Id)
                     .Include(p => p.Prompts)
                     .ToListAsync();
@@ -34,9 +37,9 @@ namespace PromptHub2.Server.Repositories
             return new List<Project>();
         }
 
-        public async Task<Project?> CreateProjectAsync(CreateProjectRequest request)
+        public async Task<Project?> CreateAsync(CreateProjectRequest request)
         {
-            var user = await _userService.GetCurrentUserAsync();
+            var user = await _userService.GetAuthenticatedUserAsync();
 
             if (user != null)
             {
@@ -58,19 +61,42 @@ namespace PromptHub2.Server.Repositories
             return null;
         }
 
-        Task<Project> IProjectService.DeleteProjectAsync(string guid)
+        public async Task<bool> DeleteAsync(string uuid)
         {
-            throw new NotImplementedException();
+            var project = await GetByIdAsync(uuid);
+
+            if(project != null)
+            {
+                _dbContext.Remove(project);
+                await _dbContext.SaveChangesAsync();
+
+                return true;
+            }
+
+            return false;
         }
 
-        Task<Project> IProjectService.GetProjectByIdAsync(string guid)
+        public async Task<Project?> GetByIdAsync(string uuid)
         {
-            throw new NotImplementedException();
+            var user = await _userService.GetAuthenticatedUserAsync();
+            if (user == null) return null;
+            return await _dbContext.Projects.SingleOrDefaultAsync(p => p.Id == uuid && p.CreatedById == user.Id);
         }
 
-        Task<Project> IProjectService.UpdateProjectAsync(string guid, Project request)
+        public async Task<Project?> UpdateAsync(string uuid, EditProjectRequest request)
         {
-            throw new NotImplementedException();
+            var project = await GetByIdAsync(uuid);
+
+            if (project != null) 
+            {
+                project.Name = request.Name;
+                project.Description = request.Description;
+                await _dbContext.SaveChangesAsync();
+
+                return project;
+            }
+
+            return null;
         }
     }
 }

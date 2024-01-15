@@ -15,5 +15,8 @@
         public const string UserDoesNotHaveRights = "The user does not have the following rights:";
         public const string AccessDenied = "Access denied.";
         public const string ServerConfigurationError = "An unexpected error occurred on the server configuration side";
+
+        //CRUD
+        public const string EntityNotFound = "{0} was not found.";
     }
 }

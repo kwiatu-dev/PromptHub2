@@ -23,7 +23,7 @@ builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, ErrorHandle
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IProjectService, ProjectRepository>();
+builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddTransient<IMailService, MailService>();
 
 builder.Services.AddCorsConfiguration(configuration);

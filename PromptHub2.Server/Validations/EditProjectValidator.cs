@@ -1,14 +1,13 @@
 ﻿using FluentValidation;
 using PromptHub2.Server.Constants;
-using PromptHub2.Server.Models.Entites;
 using PromptHub2.Server.Models.Requests;
 using PromptHub2.Server.Validations.Extensions;
 
 namespace PromptHub2.Server.Validations
 {
-    public class CreateProjectValidator : AbstractValidator<CreateProjectRequest>
+    public class EditProjectValidator : AbstractValidator<EditProjectRequest>
     {
-        public CreateProjectValidator() 
+        public EditProjectValidator() 
         {
             RuleFor(x => x.Name)
                 .NotEmpty().WithMessage(string.Format(ValidationErrors.EmptyField, "name"))

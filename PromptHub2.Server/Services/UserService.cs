@@ -16,11 +16,11 @@ namespace PromptHub2.Server.Services
             _userManager = userManager;
         }
 
-        public async Task<IdentityUser?> GetCurrentUserAsync()
+        public async Task<IdentityUser?> GetAuthenticatedUserAsync()
         {
             var userClaims = _httpContextAccessor.HttpContext?.User;
 
-            if (userClaims != null)
+            if(userClaims != null)
             {
                 return await _userManager.GetUserAsync(userClaims);
             }

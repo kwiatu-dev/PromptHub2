@@ -4,6 +4,6 @@ namespace PromptHub2.Server.Interfaces
 {
     public interface IUserService
     {
-        Task<IdentityUser?> GetCurrentUserAsync();
+        Task<IdentityUser?> GetAuthenticatedUserAsync();
     }
 }
