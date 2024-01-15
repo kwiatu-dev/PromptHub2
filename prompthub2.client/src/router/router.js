@@ -2,7 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomePage from '@/Pages/Home/HomePage.vue'
 import LoginPage from '@/Pages/Auth/LoginPage.vue'
 import UserCreate from '@/Pages/User/UserCreate.vue'
-import ProjectPage from '@/Pages/Project/ProjectPage.vue'
+import ProjectIndex from '@/Pages/Project/Index.vue'
+import ProjectShow from '@/Pages/Project/Show.vue'
 import ConfirmEmail from '@/Pages/Auth/ConfirmEmail.vue'
 import ForgotPasswordPage from '@/Pages/User/ForgotPasswordPage.vue'
 import ResetPasswordPage from '@/Pages/User/ResetPasswordPage.vue'
@@ -19,8 +20,14 @@ const routes = [
   },
   {
     path: '/projects',
-    component: ProjectPage,
+    component: ProjectIndex,
     name: 'projects',
+    meta: { auth: true },
+  },
+  {
+    path: '/projects/:uuid',
+    component: ProjectShow,
+    name: 'project',
     meta: { auth: true },
   },
   {
