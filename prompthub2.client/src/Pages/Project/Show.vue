@@ -13,7 +13,7 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import { computed, watch } from 'vue'
+import { onMounted, computed, watch } from 'vue'
 import BoxItem from '@/Pages/Project/Index/Components/BoxItem.vue'
 
 const router = useRouter()
@@ -21,7 +21,14 @@ const route = useRoute()
 const store = useStore()
 const { uuid } = route.params
 const project = computed(() => store.getters.StateProject)
-await store.dispatch('GetProject', uuid)
+
+onMounted(async () => {
+  const result = await store.dispatch('GetProject', uuid)
+
+  if(result === null){
+    router.push({ name: 'projects' })
+  }
+})
 
 watch(project, (project) => {
   if(!project){
