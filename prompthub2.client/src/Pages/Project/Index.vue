@@ -1,6 +1,6 @@
 <template>
   <CreatePopup />
-  <GridTemplate :projects="projects"/>
+  <GridTemplate :projects="projects" />
 </template>
 
 <script setup>
@@ -10,7 +10,6 @@ import { useStore } from 'vuex'
 import { computed } from 'vue'
 
 const store = useStore()
-const GetAllProjects = async () => await store.dispatch('GetAllProjects')
 const projects = computed(() => store.getters.StateProjects)
-await GetAllProjects()
+await store.dispatch('GetAllProjects')
 </script>

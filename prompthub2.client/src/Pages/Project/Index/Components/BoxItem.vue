@@ -1,11 +1,11 @@
 <template>
   <div class="mb-2">
-    <div class="text-lg font-medium">
+    <div class="text-lg font-medium" :class="{'title': view === 'single'}">
       {{ project.name }}
     </div>
-    <div class="text-sm text-gray-400">
+    <p class="text-sm text-gray-400" :class="{'!text-base': view === 'single'}">
       {{ project.description }}
-    </div>
+    </p>
   </div>
   <div>
     <div class="flex flex-col">
@@ -20,7 +20,7 @@
       </div>
     </div>
     <div class="mt-4 flex flex-col sm:flex-row flex-wrap gap-2">
-      <RouterLink class="btn-primary flex-grow" :to="{ name: 'project', params: { uuid: project.id } }">Show</RouterLink>
+      <RouterLink v-if="view !== 'single'" class="btn-primary flex-grow" :to="{ name: 'project', params: { uuid: project.id } }">Show</RouterLink>
       <EditPopup :project="project" />
       <DeleteButton :project="project" />
     </div>
@@ -33,5 +33,6 @@ import DeleteButton from '@/Pages/Project/Index/Components/DeleteButton.vue'
 
 defineProps({
   project: Object,
+  view: String,
 })
 </script>
