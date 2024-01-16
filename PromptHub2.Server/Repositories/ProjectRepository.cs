@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PromptHub2.Server.Data;
 using PromptHub2.Server.Interfaces;
 using PromptHub2.Server.Models.Entites;
@@ -80,7 +78,7 @@ namespace PromptHub2.Server.Repositories
         {
             var user = await _userService.GetAuthenticatedUserAsync();
             if (user == null) return null;
-            return await _dbContext.Projects.SingleOrDefaultAsync(p => p.Id == uuid && p.CreatedById == user.Id);
+            return await _dbContext.Projects.Where(p => p.Id == uuid && p.CreatedById == user.Id).Include(p => p.Prompts).FirstOrDefaultAsync();
         }
 
         public async Task<Project?> UpdateAsync(string uuid, EditProjectRequest request)

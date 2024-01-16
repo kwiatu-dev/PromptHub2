@@ -39,5 +39,16 @@ namespace PromptHub2.Server.Validations.Extensions
                 .NotEmpty().WithMessage(ValidationErrors.ConfirmPasswordEmpty)
                 .Equal(passwordExpression).WithMessage(ValidationErrors.ConfirmPasswordNotMatch);
         }
+
+        public static IRuleBuilder<T, string?> ValidGuid<T>(this IRuleBuilder<T, string?> ruleBuilder)
+        {
+            return ruleBuilder
+                .Must(BeAValidGuid).WithMessage(ValidationErrors.InvalidGuid);
+        }
+
+        private static bool BeAValidGuid(string? guid)
+        {
+            return Guid.TryParse(guid, out _);
+        }
     }
 }

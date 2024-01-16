@@ -24,6 +24,7 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+builder.Services.AddScoped<IPromptRepository, PromptRepository>();
 builder.Services.AddTransient<IMailService, MailService>();
 
 builder.Services.AddCorsConfiguration(configuration);
