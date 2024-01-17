@@ -9,13 +9,16 @@ namespace PromptHub2.Server.Repositories
     public class PromptRepository : IPromptRepository
     {
         private readonly IUserService _userService;
+        private readonly IProjectRepository _projectRepository;
         private readonly AppDbContext _dbContext;
 
         public PromptRepository(
             IUserService userService,
+            IProjectRepository projectRepository,
             AppDbContext dbContext)
         {
             _userService = userService;
+            _projectRepository = projectRepository;
             _dbContext = dbContext;
         }
 
@@ -34,7 +37,7 @@ namespace PromptHub2.Server.Repositories
             return new List<Prompt>();
         }
 
-        public async Task<Prompt?> GetByIdAsync(string uuid)
+        public async Task<Prompt?> GetByIdAsync(string guid)
         {
             var user = await _userService.GetAuthenticatedUserAsync();
 
@@ -42,23 +45,26 @@ namespace PromptHub2.Server.Repositories
             {
                 return await _dbContext.Prompts
                     .AsNoTracking()
-                    .Where(p => p.CreatedById == user.Id && p.Id == uuid)
+                    .Where(p => p.CreatedById == user.Id && p.Id == guid)
                     .FirstOrDefaultAsync();
             }
 
             return null;
         }
 
-        public async Task<Prompt?> CreateAsync(CreatePromptRequest request)
+        public async Task<Prompt?> CreateAsync(string projectId, CreatePromptRequest request)
         {
             var user = await _userService.GetAuthenticatedUserAsync();
+            var project = await _projectRepository.GetByIdAsync(projectId);
 
-            if (user != null)
+            if (user != null && project != null)
             {
+                if (project.CreatedById != user.Id) return null;
+
                 Prompt prompt = new()
                 {
                     Id = Guid.NewGuid().ToString(),
-                    ProjectId = request.ProjectId,
+                    ProjectId = projectId,
                     Name = request.Name,
                     Description = request.Description,
                     CreatedById = user.Id,
@@ -95,8 +101,17 @@ namespace PromptHub2.Server.Repositories
 
         public async Task<bool> DeleteAsync(string guid)
         {
-            await Task.CompletedTask;
-            throw new NotImplementedException();
+            var prompt = await GetByIdAsync(guid);
+
+            if (prompt != null)
+            {
+                _dbContext.Prompts.Remove(prompt);
+                await _dbContext.SaveChangesAsync();
+
+                return true;
+            }
+
+            return false;
         }
     }
 }

@@ -1,4 +1,5 @@
 import axios from 'axios'
+import handleRequest from '@/helpers/handleRequest'
 
 const state = () => ({
   antiForgeryToken: null,
@@ -8,24 +9,24 @@ const getters = {
 }
 const actions = {
   async GetAntiForgeryToken({ commit }){
-    if(state.StateAntiForgeryToken) return
+    if(!state.StateAntiForgeryToken){
+      const { result } = await handleRequest(axios.get, '/antiforgery/token')
 
-    try{
-      const response = await axios.get('/antiforgery/token')
-
-      const token = response.data.token
-      commit('SetAntiForgeryToken', token)
-
-      return token
+      if(result?.token){
+        commit('SetAntiForgeryToken', result.token)
+        return result.token
+      }
     }
-    catch(error){
-      return error.response.data
-    }
+
+    return null
   },
 }
 const mutations = {
   SetAntiForgeryToken(state, token){
     state.antiForgeryToken = token
+  },
+  RemoveAntiForgeryToken(state){
+    state.antiForgeryToken = null
   },
 }
 export default {

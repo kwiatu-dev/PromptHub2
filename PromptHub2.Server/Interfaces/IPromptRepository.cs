@@ -5,10 +5,10 @@ namespace PromptHub2.Server.Interfaces
 {
     public interface IPromptRepository
     {
-        Task<Prompt?> CreateAsync(CreatePromptRequest request);
-        Task<bool> DeleteAsync(string uuid);
         Task<List<Prompt>> GetAllAsync(string projectId);
-        Task<Prompt?> GetByIdAsync(string uuid);
-        Task<Prompt?> UpdateAsync(string uuid, EditPromptRequest request);
+        Task<Prompt?> GetByIdAsync(string guid);
+        Task<Prompt?> CreateAsync(string projectId, CreatePromptRequest request);
+        Task<Prompt?> UpdateAsync(string guid, EditPromptRequest request);
+        Task<bool> DeleteAsync(string guid);
     }
 }

@@ -50,8 +50,6 @@ const edit = async () => {
   
   if(!response.errors){
     form.errors = {}
-    form.name = null
-    form.description = null
     emit('edited')
   }
 }

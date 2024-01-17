@@ -22,71 +22,71 @@ namespace PromptHub2.Server.Controllers
 
         [Route("/projects")]
         [HttpGet]
-        public async Task<ActionResult<List<Project>>> GetAll()
+        public async Task<ActionResult> GetAll()
         {
-            return await _projectRepository.GetAllAsync();
+            return Ok(await _projectRepository.GetAllAsync());
+        }
+
+        [Route("/projects/{guid}")]
+        [HttpGet]
+        public async Task<ActionResult> GetById(string guid)
+        {
+            var project = await _projectRepository.GetByIdAsync(guid);
+
+            if (project != null)
+            {
+                return Ok(project);
+            }
+
+            return NotFound(new ErrorResponse
+            {
+                Message = string.Format(Errors.EntityNotFound, nameof(Project))
+            });
         }
 
         [Route("/projects")]
         [HttpPost]
-        public async Task<ActionResult<Project>> Create(CreateProjectRequest request)
+        public async Task<ActionResult> Create(CreateProjectRequest request)
         {
-            var result = await _projectRepository.CreateAsync(request);
+            var project = await _projectRepository.CreateAsync(request);
 
-            if(result != null)
+            if(project != null)
             {
-                return Created(nameof(GetById), result);
+                return Created(nameof(GetById), project);
             }
 
             return BadRequest(new ErrorResponse());
         }
 
-        [Route("/projects/{uuid}")]
-        [HttpDelete]
-        public async Task<ActionResult> Delete(string uuid)
+        [Route("/projects/{guid}")]
+        [HttpPut]
+        public async Task<ActionResult> Update(string guid, EditProjectRequest request)
         {
-            var result = await _projectRepository.DeleteAsync(uuid);
+            var project = await _projectRepository.UpdateAsync(guid, request);
 
-            if(result == true)
+            if(project != null)
+            {
+                return Ok(project);
+            }
+
+            return NotFound(new ErrorResponse
+            {
+                Message = string.Format(Errors.EntityNotFound, nameof(Project))
+            });
+        }
+
+        [Route("/projects/{guid}")]
+        [HttpDelete]
+        public async Task<ActionResult> Delete(string guid)
+        {
+            var result = await _projectRepository.DeleteAsync(guid);
+
+            if (result == true)
             {
                 return Ok(new SuccedResponse
                 {
                     Message = string.Format(Messages.EntityDeleted, nameof(Project))
-                }); 
-            }
-
-            return NotFound(new ErrorResponse
-            {
-                Message = string.Format(Errors.EntityNotFound, nameof(Project))
-            });
-        }
-
-        [Route("/projects/{uuid}")]
-        [HttpGet]
-        public async Task<ActionResult> GetById(string uuid)
-        {
-            var result = await _projectRepository.GetByIdAsync(uuid);
-
-            if(result != null)
-            {
-                return Ok(result);
-            }
-
-            return NotFound(new ErrorResponse
-            {
-                Message = string.Format(Errors.EntityNotFound, nameof(Project))
-            });
-        }
-
-        [Route("/projects/{uuid}")]
-        [HttpPut]
-        public async Task<ActionResult> Update(string uuid, EditProjectRequest request)
-        {
-            var result = await _projectRepository.UpdateAsync(uuid, request);
-
-            if(result != null)
-            {
-                return Ok(result);
+                });
             }
 
             return NotFound(new ErrorResponse

@@ -26,7 +26,7 @@ namespace PromptHub2.Server.Models.Entites
         public string? Model { get; set; }
 
         [Required]
-        public int? Tokens { get; set; }
+        public uint Tokens { get; set; }
 
         [Required]
         [ForeignKey("Project")]

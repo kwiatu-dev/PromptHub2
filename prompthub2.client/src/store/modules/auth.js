@@ -1,7 +1,7 @@
 import axios from 'axios'
-import parseJwt from '@/helpers/parseJwt.js'
-import { ROLE_SCHEMA, EMAIL_SCHEMA } from '@/constants/schemas'
-import { RemoveJWTCookie, SetJWTCookie } from '@/helpers/tokens'
+import handleRequest from '@/helpers/handleRequest'
+import logoutTabs from '@/helpers/logoutTabs'
+import cookies from '@/helpers/cookies'
 
 const state = () => ({
   user: null,
@@ -13,57 +13,45 @@ const getters = {
 }
 const actions = {
   async SignUp(_, form){
-    try{
-      const response = await axios.post('/Authenticate/Register', form)
-
-      return response.data
-    }
-    catch(error){
-      return error.response.data
-    }
-    
+    const { result } = await handleRequest(axios.post, '/Authenticate/Register', form)
+    return result
   },
   async LogIn({commit}, form){
-    try{
-      const response = await axios.post('/Authenticate/Login', form)
-      const tokenString = response.data.token 
-      const token = parseJwt(tokenString)
-      const expires = new Date(token.exp * 1000)
-      SetJWTCookie(tokenString, { expires })
-
-      await commit('SetUser', {
-        email: token[EMAIL_SCHEMA],
-        token: tokenString,
-        role: token[ROLE_SCHEMA] ?? null,
-      })
-
-      return response.data
+    const { result } = await handleRequest(axios.post, '/Authenticate/Login', form)
+    
+    if(result?.token){
+      commit('SetUser', cookies.setUser(result.token))
     }
-    catch(error){
-      return error.response.data
+
+    return result
+  },
+  LogInFromCookie({ commit }){
+    const user = cookies.getUser()
+
+    if(user){
+      commit('SetUser', user)
     }
   },
-  async LogOut({commit}){
-    RemoveJWTCookie()
+  async LogOut({ commit }){
+    cookies.removeUser()
+    commit('RemoveAntiForgeryToken')
+    commit('ResetProjectState')
+    commit('ResetProjectsState')
     commit('LogOut')
   },
   async ConfirmEmail(_, payload){
-    try{
-      const response = await axios.post('/Authenticate/ConfirmEmail', payload)
-
-      return response.data
-    }
-    catch(error){
-      return error.response.data
-    }
+    const { result } = await handleRequest(axios.post, '/Authenticate/ConfirmEmail', payload)
+    return result
   },
 }
 const mutations = {
   SetUser(state, user){
     state.user = user
+    logoutTabs.emitLoginEvent()
   },
   LogOut(state){
     state.user = null
+    logoutTabs.emitLogoutEvent()
   },
 }
 export default {

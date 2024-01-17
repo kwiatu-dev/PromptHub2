@@ -1,4 +1,5 @@
 import axios from 'axios'
+import handleRequest from '@/helpers/handleRequest'
 
 const state = () => ({
   
@@ -8,24 +9,12 @@ const getters = {
 }
 const actions = {
   async ForgotPassword(_, payload){
-    try{
-      const response = await axios.post('/Account/ForgotPassword', payload)
-
-      return response.data
-    }
-    catch(error){
-      return error.response.data
-    }
+    const { result } = await handleRequest(axios.post, '/Account/ForgotPassword', payload)
+    return result
   },
   async ResetPassword(_, payload){
-    try{
-      const response = await axios.post('/Account/ResetPassword', payload)
-
-      return response.data
-    }
-    catch(error){
-      return error.response.data
-    }
+    const { result } = await handleRequest(axios.post, '/Account/ResetPassword', payload)
+    return result
   },
 }
 const mutations = {

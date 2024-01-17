@@ -5,7 +5,12 @@
         Email verification successful. <br />
         Click the button to go to the login page.
       </p>
-      <RouterLink :to="{ name: 'login' }" class="bg-gray-300 px-4 py-1">Sign In</RouterLink>
+      <RouterLink 
+        :to="{ name: 'login' }" 
+        class="bg-gray-300 px-4 py-1"
+      >
+        Sign In
+      </RouterLink>
     </div>
     <div v-else>
       <p class="mb-2">

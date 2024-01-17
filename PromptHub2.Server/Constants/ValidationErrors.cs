@@ -17,9 +17,12 @@
 
         //Projects
         public const string EmptyField = "The {0} field must not be empty";
+        public const string InvalidField = "The {0} field is invalid.";
         public const string MinimumLengthText = "The minimum number of characters is {0}";
         public const string MaximumLengthText = "The maximum number of characters is {0}";
         public const string InvalidGuid = "The field does not have a valid GUID value.";
         public const string EntityNotExist = "The {0} with the specified id does not exist.";
+        public const string MinimumValue = "The smallest number allowed is {0}";
+
     }
 }

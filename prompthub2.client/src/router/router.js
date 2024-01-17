@@ -123,13 +123,13 @@ router.beforeEach((to, from, next) => {
   next()
 })
 
-router.beforeEach(async _ => {
+// eslint-disable-next-line no-unused-vars
+router.beforeEach(async (_) => {
   const isAuthenticated = store.getters.isAuthenticated
 
-  if(
-    isAuthenticated && 
-    !store.getters.StateAntiForgeryToken
-  ){
+  if(isAuthenticated && 
+    !store.getters.StateAntiForgeryToken)
+  {
     await store.dispatch('GetAntiForgeryToken')
   }
 })

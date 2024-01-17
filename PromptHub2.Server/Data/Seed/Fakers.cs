@@ -36,7 +36,7 @@ namespace PromptHub2.Server.Data.Seed
                 .RuleFor(p => p.Description, f => f.Lorem.Paragraph().ClampLength(50, 256))
                 .RuleFor(p => p.Messages, f => messageFaker.Generate(f.Random.Int(1, 10)).ToList())
                 .RuleFor(p => p.Model, f => f.Random.ArrayElement(models))
-                .RuleFor(p => p.Tokens, f => f.Random.Int(13, 16000))
+                .RuleFor(p => p.Tokens, f => f.Random.UInt(13, 16000))
                 .RuleFor(p => p.CreatedAt, f => f.Date.Between(new DateTime(2022, 1, 1), new DateTime(2023, 12, 31)))
                 .RuleFor(p => p.UpdatedAt, (f, p) => p.CreatedAt)
                 .RuleFor(p => p.IsDeleted, f => f.Random.Bool());

@@ -59,9 +59,9 @@ namespace PromptHub2.Server.Repositories
             return null;
         }
 
-        public async Task<bool> DeleteAsync(string uuid)
+        public async Task<bool> DeleteAsync(string guid)
         {
-            var project = await GetByIdAsync(uuid);
+            var project = await GetByIdAsync(guid);
 
             if(project != null)
             {
@@ -74,16 +74,16 @@ namespace PromptHub2.Server.Repositories
             return false;
         }
 
-        public async Task<Project?> GetByIdAsync(string uuid)
+        public async Task<Project?> GetByIdAsync(string guid)
         {
             var user = await _userService.GetAuthenticatedUserAsync();
             if (user == null) return null;
-            return await _dbContext.Projects.Where(p => p.Id == uuid && p.CreatedById == user.Id).Include(p => p.Prompts).FirstOrDefaultAsync();
+            return await _dbContext.Projects.Where(p => p.Id == guid && p.CreatedById == user.Id).Include(p => p.Prompts).FirstOrDefaultAsync();
         }
 
-        public async Task<Project?> UpdateAsync(string uuid, EditProjectRequest request)
+        public async Task<Project?> UpdateAsync(string guid, EditProjectRequest request)
         {
-            var project = await GetByIdAsync(uuid);
+            var project = await GetByIdAsync(guid);
 
             if (project != null) 
             {

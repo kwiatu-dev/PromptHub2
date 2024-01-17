@@ -1,7 +1,7 @@
-import router from '@/router/router.js'
+import router from '@/router/router'
 import store from '@/store'
 import axios from 'axios'
-import { GetJWTFromCookie } from '@/helpers/tokens'
+import cookies from '@/helpers/cookies'
 
 axios.defaults.withCredentials = true
 axios.defaults.baseURL = import.meta.env.VITE_ENDPOINT_URL
@@ -10,7 +10,7 @@ axios.interceptors.request.use(async function(config){
   const isAuthenticated = store.getters.isAuthenticated
 
   if(isAuthenticated){
-    config.headers.Authorization = `Bearer ${GetJWTFromCookie()}`
+    config.headers.Authorization = `Bearer ${ cookies.getJwt() }`
   }
 
   if(store.getters.StateAntiForgeryToken){
@@ -21,10 +21,13 @@ axios.interceptors.request.use(async function(config){
 }, undefined)
 
 axios.interceptors.response.use(undefined, function(error){
-  if (error) {
+  if(error){
     const originalRequest = error.config
 
-    if(error.response.status === 401 && !originalRequest._retry){
+    if((error.response.status === 401 
+      || error.response.status === 403) 
+      && !originalRequest._retry)
+    {
       originalRequest._retry = true
       store.dispatch('LogOut')
       router.push({ name: 'login' })

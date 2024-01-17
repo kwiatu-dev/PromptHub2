@@ -1,4 +1,5 @@
 import axios from 'axios'
+import handleRequest from '@/helpers/handleRequest'
 
 const state = () => ({
   project: null,
@@ -10,64 +11,50 @@ const getters = {
 }
 const actions = {
   async GetAllProjects({ commit }){
-    try{
-      const response = await axios.get('/projects')
-      const projects = response.data
-      commit('SetProjects', projects)
+    const { success, result } = await handleRequest(axios.get, '/projects')
 
-      return projects
+    if(success){
+      commit('SetProjects', result)
     }
-    catch(error){
-      return []
-    }
+
+    return result
   },
   async GetProject({ commit }, uuid){
-    try{
-      const response = await axios.get(`/projects/${uuid}`)
-      const project = response.data
-      commit('SetProject', project)
+    const { success, result } = await handleRequest(axios.get, `/projects/${uuid}`)
 
-      return project
+    if(success){
+      commit('SetProject', result)
     }
-    catch(error){
-      return null
-    }
+
+    return result
   },
   async CreateProject({ commit }, form){
-    try{
-      const response = await axios.post('/projects', form)
-      const project = response.data
-      commit('AddProject', project)
+    const { success, result } = await handleRequest(axios.post, '/projects', form)
 
-      return project
+    if(success){
+      commit('AddProject', result)
     }
-    catch(error){
-      return null
-    }
+
+    return result
   },
   async DeleteProject({ commit }, uuid){
-    try{
-      await axios.delete(`/projects/${uuid}`)
-      commit('DeleteProject', uuid)
+    const { success, result } = await handleRequest(axios.delete, `/projects/${uuid}`)
 
-      return true
+    if(success){
+      commit('DeleteProject', uuid)
     }
-    catch(error){
-      return false
-    }
+
+    return result
   },
   async EditProject({ commit }, data){
-    try{
-      const { uuid, form } = data
-      const response = await axios.put(`/projects/${uuid}`, form)
-      const project = response.data
-      commit('EditProject', { uuid, project })
+    const { uuid, form } = data
+    const { success, result } = await handleRequest(axios.put, `/projects/${uuid}`, form)
 
-      return project
+    if(success){
+      commit('EditProject', { uuid, project: result })
     }
-    catch(error){
-      return null
-    }
+
+    return result
   },
 }
 const mutations = {
@@ -107,6 +94,12 @@ const mutations = {
     if(state.project?.id === uuid){
       state.project = null
     }
+  },
+  ResetProjectState(state){
+    state.project = null
+  },
+  ResetProjectsState(state){
+    state.projects = null
   },
 }
 export default {

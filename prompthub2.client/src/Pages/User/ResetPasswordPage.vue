@@ -1,22 +1,56 @@
 <template>
   <div>
-    <h1 class="title">Reset password</h1>
-    <form class="grid grid-cols-12 gap-y-4 bg-gray-100 p-4" autocomplete="off" @submit.prevent="reset">
+    <h1 class="title">
+      Reset password
+    </h1>
+    <form 
+      class="grid grid-cols-12 gap-y-4 bg-gray-100 p-4" 
+      autocomplete="off" 
+      @submit.prevent="reset"
+    >
       <div class="col-span-12">
-        <label for="password" class="label">Password</label>
-        <input id="password" v-model="form.password" type="password" class="input-text" />
+        <label 
+          for="password" 
+          class="label"
+        >
+          Password
+        </label>
+        <input 
+          id="password" 
+          v-model="form.password" 
+          type="password" 
+          class="input-text"
+        />
         <FormError :errors="form.errors.password" />
       </div>
       <div class="col-span-12">
-        <label for="confirmpassword" class="label">Confirm password</label>
-        <input id="confirmpassword" v-model="form.confirmpassword" type="password" class="input-text" />
+        <label 
+          for="confirmpassword" 
+          class="label"
+        >
+          Confirm password
+        </label>
+        <input 
+          id="confirmpassword" 
+          v-model="form.confirmpassword" 
+          type="password" 
+          class="input-text"
+        />
         <FormError :errors="form.errors.confirmpassword" />
       </div>
       <div class="col-span-12">
         <div class="flex flex-row items-center justify-start gap-4">
-          <button type="submit" class="btn-submit">Reset password</button>
+          <button 
+            type="submit" 
+            class="btn-submit"
+          >
+            Reset password
+          </button>
         </div>
-        <FormMessage :message="message" :status="status" />
+        <FormMessage 
+          :message="message" 
+          :status="status"
+        />
       </div>
     </form>
   </div>
@@ -50,10 +84,10 @@ onMounted(() => {
 })
 
 const reset = async () => {
-  const response = await ResetPassword(form)
-  message.value = response.message
-  status.value = response.status
-  form.errors = response.errors ?? {}
+  const result = await ResetPassword(form)
+  message.value = result.message
+  status.value = result.status
+  form.errors = result.errors ?? {}
   form.password = null
   form.confirmpassword = null
 }
