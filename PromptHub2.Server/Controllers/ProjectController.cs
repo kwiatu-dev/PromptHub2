@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PromptHub2.Server.Constants;
 using PromptHub2.Server.Interfaces;
 using PromptHub2.Server.Models.Entites;
+using PromptHub2.Server.Models.Entites.Extensions;
 using PromptHub2.Server.Models.Requests;
 using PromptHub2.Server.Models.Responses;
 
@@ -24,7 +25,7 @@ namespace PromptHub2.Server.Controllers
         [HttpGet]
         public async Task<ActionResult> GetAll()
         {
-            return Ok(await _projectRepository.GetAllAsync());
+            return Ok((await _projectRepository.GetAllAsync()).GenerateResponse());
         }
 
         [Route("/projects/{guid}")]
@@ -35,7 +36,7 @@ namespace PromptHub2.Server.Controllers
 
             if (project != null)
             {
-                return Ok(project);
+                return Ok(project.GenerateResponse());
             }
 
             return NotFound(new ErrorResponse
@@ -52,7 +53,7 @@ namespace PromptHub2.Server.Controllers
 
             if(project != null)
             {
-                return Created(nameof(GetById), project);
+                return Created(nameof(GetById), project.GenerateResponse());
             }
 
             return BadRequest(new ErrorResponse());
@@ -66,7 +67,7 @@ namespace PromptHub2.Server.Controllers
 
             if(project != null)
             {
-                return Ok(project);
+                return Ok(project.GenerateResponse());
             }
 
             return NotFound(new ErrorResponse

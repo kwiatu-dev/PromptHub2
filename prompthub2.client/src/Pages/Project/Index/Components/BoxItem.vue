@@ -20,19 +20,19 @@
           <span class="text-sm font-bold">
             Prompts: 
           </span> 
-          {{ project.prompts?.length ?? 0 }}
+          {{ project.promptsCount }}
         </div>
         <div class="w-full">
           <span class="text-sm font-bold">
             Created at: 
           </span> 
-          {{ new Date(project.createdAt).toLocaleString() }}          
+          {{ project.createdAt }}          
         </div>
         <div class="w-full">
           <span class="text-sm font-bold">
             Updated at: 
           </span> 
-          {{ new Date(project.updatedAt).toLocaleString() }}          
+          {{ project.updatedAt }}          
         </div>
       </div>
       <div class="mt-4 flex flex-col sm:flex-row flex-wrap gap-2">

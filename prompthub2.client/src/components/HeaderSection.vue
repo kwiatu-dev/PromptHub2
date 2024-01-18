@@ -60,8 +60,9 @@
         </button>
       </div>
       <div 
-        class="mt-4 md:mt-0 items-center justify-between w-full md:flex md:w-auto md:order-1 bg-gray-700 md:bg-transparent" 
+        class="mt-4 md:mt-0 items-center justify-between w-full md:flex md:w-auto md:order-1 bg-gray-700 md:bg-transparent left-0 md:static absolute" 
         :class="[showMenu ? 'block' : 'hidden']"
+        style="top: calc(64px - 1rem);"
       >
         <ul class="flex flex-col font-medium md:p-0 md:space-x-8 md:flex-row md:mt-0 md:border-0">
           <li>

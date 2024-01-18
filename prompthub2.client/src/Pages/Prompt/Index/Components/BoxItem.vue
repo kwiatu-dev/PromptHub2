@@ -24,19 +24,19 @@
       <span class="font-medium">
         Messages: 
       </span> 
-      {{ prompt.messages?.length ?? 0 }}
+      {{ prompt.messagesCount }}
     </div>
     <div class="text-sm">
       <span class="font-medium">
         Created At: 
       </span> 
-      {{ new Date(prompt.createdAt).toLocaleString() }}
+      {{ prompt.createdAt }}
     </div>
     <div class="text-sm">
       <span class="font-medium">
         Updated At: 
       </span> 
-      {{ new Date(prompt.updatedAt).toLocaleString() }}
+      {{ prompt.updatedAt }}
     </div>
     <div class="flex flex-row gap-2 mt-2">
       <button class="btn-primary flex-grow">

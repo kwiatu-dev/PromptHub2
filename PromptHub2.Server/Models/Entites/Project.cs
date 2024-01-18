@@ -18,7 +18,7 @@ namespace PromptHub2.Server.Models.Entites
         [MaxLength(256)]
         public string? Description { get; set; }
 
-        public ICollection<Prompt>? Prompts { get; set; }
+        public ICollection<Prompt> Prompts { get; set; }
 
         [Required]
         public DateTime? CreatedAt { get; set; }

@@ -30,7 +30,7 @@ namespace PromptHub2.Server.Models.Entites
 
         [Required]
         [ForeignKey("Project")]
-        public string? ProjectId { get; set; }
+        public string ProjectId { get; set; } = string.Empty;
 
         [JsonIgnore]
         public virtual Project? Project { get; set; }

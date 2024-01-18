@@ -1,11 +1,16 @@
 <template>
-  <DefaultPopup 
-    :form="CreateForm" 
-    caption="Create project" 
-    title="Create project"
-    class="mb-4"
-  />
-  <GridTemplate :projects="projects" />
+  <div 
+    class="overflow-y-auto" 
+    style="height: calc(100vh - 64px - 2rem);"
+  >
+    <DefaultPopup 
+      :form="CreateForm" 
+      caption="Create project" 
+      title="Create project"
+      class="mb-4"
+    />
+    <GridTemplate :projects="projects" />
+  </div>
 </template>
 
 <script setup>

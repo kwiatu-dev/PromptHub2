@@ -3,6 +3,7 @@ using PromptHub2.Server.Data;
 using PromptHub2.Server.Interfaces;
 using PromptHub2.Server.Models.Entites;
 using PromptHub2.Server.Models.Requests;
+using System;
 
 namespace PromptHub2.Server.Repositories
 {
@@ -32,7 +33,7 @@ namespace PromptHub2.Server.Repositories
                     .ToListAsync();
             }
 
-            return new List<Project>();
+            return new();
         }
 
         public async Task<Project?> CreateAsync(CreateProjectRequest request)

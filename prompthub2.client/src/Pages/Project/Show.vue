@@ -1,6 +1,6 @@
 <template>
   <div 
-    class="w-full flex flex-row gap-4" 
+    class="w-full flex flex-row gap-4"
     style="height: calc(100vh - 64px - 2rem);"
   >
     <div class="w-1/2 md:w-2/5 bg-gray-200 shadow p-4">
@@ -32,6 +32,7 @@ const store = useStore()
 
 const { guid } = route.params
 const project = computed(() => store.getters.StateProject)
+const prompts = computed(() => store.getters.StatePrompts)
 
 onMounted(async () => {
   const result = await store.dispatch('GetProject', guid)
@@ -39,10 +40,16 @@ onMounted(async () => {
   if(result === null){
     router.push({ name: 'projects' })
   }
+
+  watch(prompts, async (after, before) => {
+    if(before){
+      await store.dispatch('GetProject', guid)
+    }
+  }, { deep: true })
 })
 
-watch(project, (project) => {
-  if(!project){
+watch(project, (after) => {
+  if(!after){
     router.push({ name: 'projects' })
   }
 })
