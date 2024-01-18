@@ -49,7 +49,7 @@
           <RouterLink 
             :to="{name: 'login'}"
           >
-            Already have an account? Click here!
+            {{ HasAccount }}
           </RouterLink>
         </div>
         <FormMessage 
@@ -62,6 +62,7 @@
 </template>
 
 <script setup>
+import { HasAccount } from '@/constants/inlineMessages'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { ref, reactive } from 'vue'
@@ -70,8 +71,6 @@ import FormMessage from '@/components/FormMessage.vue'
 
 const router = useRouter()
 const store = useStore()
-
-const SignUp = async (form) => await store.dispatch('SignUp', form)
 const message = ref(null)
 const status = ref(null)
 
@@ -92,4 +91,6 @@ const create = async () => {
     router.push({ name: 'login' })
   }
 }
+
+const SignUp = async (form) => await store.dispatch('SignUp', form)
 </script>

@@ -76,8 +76,6 @@ const form = reactive({
   errors: {},
 })
   
-const ResetPassword = async (payload) => await store.dispatch('ResetPassword', payload)
-  
 onMounted(() => {
   form.token = route.query.token
   form.email = route.query.email
@@ -91,4 +89,6 @@ const reset = async () => {
   form.password = null
   form.confirmpassword = null
 }
+
+const ResetPassword = async (payload) => await store.dispatch('ResetPassword', payload)
 </script>

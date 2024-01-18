@@ -1,23 +1,23 @@
 <template>
   <button 
     class="btn-primary" 
-    @click="DeleteProject"
+    @click="DeletePrompt"
   >
     Delete
   </button>
 </template>
-
+  
 <script setup>
 import { useStore } from 'vuex'
-
+  
 const store = useStore()
-
+  
 const props = defineProps({
-  project: {
+  prompt: {
     type: Object,
     required: true,
   },
 })
-
-const DeleteProject = async () => await store.dispatch('DeleteProject', props.project.id)
+  
+const DeletePrompt = async () => await store.dispatch('DeletePrompt', props.prompt.id)
 </script>

@@ -2,7 +2,7 @@
   <form 
     class="grid grid-cols-12 gap-4" 
     autocomplete="off" 
-    @submit.prevent="edit"
+    @submit.prevent="create"
   >
     <div class="col-span-12">
       <label 
@@ -36,10 +36,10 @@
     <div class="col-span-12">
       <div class="flex flex-row items-center justify-start gap-4">
         <button 
-          type="submit" 
+          type="submit"
           class="btn-submit"
         >
-          Edit
+          Create
         </button>
       </div>
       <FormMessage 
@@ -51,10 +51,10 @@
 </template>
   
 <script setup>
-import { useStore } from 'vuex'
-import { ref, reactive } from 'vue'
 import FormError from '@/components/FormError.vue'
 import FormMessage from '@/components/FormMessage.vue'
+import { useStore } from 'vuex'
+import { ref, reactive } from 'vue'
 
 const props = defineProps({
   object: {
@@ -63,29 +63,30 @@ const props = defineProps({
   },
 })
 
-const store = useStore()
 const emit = defineEmits(['close'])
-  
+const store = useStore()
 const message = ref(null)
 const status = ref(null)
   
 const form = reactive({
-  name: props.object.name ?? null,
-  description: props.object.description ?? null,
+  name: null,
+  description: null,
   errors: {},
 })
   
-const edit = async () => {
-  const response = await EditProject({ guid: props.object.id, form })
+const create = async () => {
+  const response = await CreatePrompt({ guid: props.object.id, form })
   message.value = response.message
   status.value = response.status
   form.errors = response.errors ?? {}
   
   if(!response.errors){
     form.errors = {}
+    form.name = null
+    form.description = null
     emit('close')
   }
 }
 
-const EditProject = async (data) => await store.dispatch('EditProject', data)
+const CreatePrompt = async (data) => await store.dispatch('CreatePrompt', data)
 </script>

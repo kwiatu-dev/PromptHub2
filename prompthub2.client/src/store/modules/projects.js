@@ -19,8 +19,8 @@ const actions = {
 
     return result
   },
-  async GetProject({ commit }, uuid){
-    const { success, result } = await handleRequest(axios.get, `/projects/${uuid}`)
+  async GetProject({ commit }, guid){
+    const { success, result } = await handleRequest(axios.get, `/projects/${guid}`)
 
     if(success){
       commit('SetProject', result)
@@ -37,21 +37,21 @@ const actions = {
 
     return result
   },
-  async DeleteProject({ commit }, uuid){
-    const { success, result } = await handleRequest(axios.delete, `/projects/${uuid}`)
+  async DeleteProject({ commit }, guid){
+    const { success, result } = await handleRequest(axios.delete, `/projects/${guid}`)
 
     if(success){
-      commit('DeleteProject', uuid)
+      commit('DeleteProject', guid)
     }
 
     return result
   },
   async EditProject({ commit }, data){
-    const { uuid, form } = data
-    const { success, result } = await handleRequest(axios.put, `/projects/${uuid}`, form)
+    const { guid, form } = data
+    const { success, result } = await handleRequest(axios.put, `/projects/${guid}`, form)
 
     if(success){
-      commit('EditProject', { uuid, project: result })
+      commit('EditProject', { guid, project: result })
     }
 
     return result
@@ -68,30 +68,30 @@ const mutations = {
     state.projects.push(project)
   },
   EditProject(state, data){
-    const { uuid, project } = data
+    const { guid, project } = data
 
-    if(state.projects){
-      const index = state.projects.findIndex(project => project.id === uuid)
+    if(state.projects?.length){
+      const index = state.projects.findIndex(project => project.id === guid)
 
       if(index !== -1){
         state.projects[index] = project
       }
     }
     
-    if(state.project?.id === uuid){
+    if(state.project?.id === guid){
       state.project = project
     }
   },
-  DeleteProject(state, uuid){
-    if(state.projects){
-      const index = state.projects.findIndex(project => project?.id === uuid)
+  DeleteProject(state, guid){
+    if(state.projects?.length){
+      const index = state.projects.findIndex(project => project?.id === guid)
 
       if(index !== -1){
         state.projects.splice(index, 1)
       }
     }
 
-    if(state.project?.id === uuid){
+    if(state.project?.id === guid){
       state.project = null
     }
   },

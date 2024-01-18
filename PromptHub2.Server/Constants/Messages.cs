@@ -6,8 +6,6 @@
         public const string PasswordReseted = "The password has been reset.";
         public const string UserCreated = "The user has been successfully created.";
         public const string EmailVerifiedSuccessful = "The email address has been successfully verified.";
-
-        //CRUD
         public const string EntityDeleted = "{0} was removed successfully.";
     }
 }

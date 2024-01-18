@@ -77,8 +77,16 @@ namespace PromptHub2.Server.Repositories
         public async Task<Project?> GetByIdAsync(string guid)
         {
             var user = await _userService.GetAuthenticatedUserAsync();
-            if (user == null) return null;
-            return await _dbContext.Projects.Where(p => p.Id == guid && p.CreatedById == user.Id).Include(p => p.Prompts).FirstOrDefaultAsync();
+
+            if (user != null)
+            {
+                return await _dbContext.Projects
+                    .Where(p => p.Id == guid && p.CreatedById == user.Id)
+                    .Include(p => p.Prompts)
+                    .FirstOrDefaultAsync();
+            }
+
+            return null;
         }
 
         public async Task<Project?> UpdateAsync(string guid, EditProjectRequest request)

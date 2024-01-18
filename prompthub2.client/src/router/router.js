@@ -25,7 +25,7 @@ const routes = [
     meta: { auth: true },
   },
   {
-    path: '/projects/:uuid',
+    path: '/projects/:guid',
     component: ProjectShow,
     name: 'project',
     meta: { auth: true },

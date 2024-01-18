@@ -1,9 +1,8 @@
 <template>
-  <div v-if="isResponse">
+  <div v-if="resultLoaded">
     <div v-if="!errors">
       <p class="mb-2">
-        Email verification successful. <br />
-        Click the button to go to the login page.
+        {{ EmailVerifySuccessful }}
       </p>
       <RouterLink 
         :to="{ name: 'login' }" 
@@ -14,11 +13,13 @@
     </div>
     <div v-else>
       <p class="mb-2">
-        Email verification failed. <br />
-        Please contact with support team.
+        {{ EmailVerifyFail }}
       </p>
       <ul>
-        <li v-for="(error, index) in errors" :key="index">
+        <li 
+          v-for="(error, index) in errors" 
+          :key="index"
+        >
           - {{ error.join(", ") }}
         </li>
       </ul>
@@ -27,6 +28,7 @@
 </template>
 
 <script setup>
+import { EmailVerifySuccessful, EmailVerifyFail } from '@/constants/inlineMessages'
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
@@ -34,17 +36,15 @@ import { useStore } from 'vuex'
 const route = useRoute()
 const store = useStore() 
 const errors = ref(null)
-const isResponse = ref(false)
+const resultLoaded = ref(false)
 
 const ConfirmEmail = async (payload) => await store.dispatch('ConfirmEmail', payload)
 
-onMounted(() => {
+onMounted(async () => {
   const token = route.query.token
   const email = route.query.email
-
-  ConfirmEmail({ token, email }).then(response => {
-    isResponse.value = true
-    errors.value = response.errors ?? null
-  })
+  const result = await ConfirmEmail({ token, email })
+  resultLoaded.value = true
+  errors.value = result.errors ?? null
 })
 </script>

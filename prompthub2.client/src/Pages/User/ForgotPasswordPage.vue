@@ -48,8 +48,6 @@ import FormError from '@/components/FormError.vue'
 import FormMessage from '@/components/FormMessage.vue'
   
 const store = useStore()
-  
-const ForgotPassword = async (form) => await store.dispatch('ForgotPassword', form)
 const message = ref(null)
 const status = ref(null)
 
@@ -65,4 +63,6 @@ const forgot = async () => {
   form.errors = result.errors ?? {}
   form.email = null
 }
+
+const ForgotPassword = async (form) => await store.dispatch('ForgotPassword', form)
 </script>

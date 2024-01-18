@@ -2,7 +2,6 @@
 {
     public static class Errors
     {
-        //Authenticate && Account
         public const string ResetPasswordError = "There was a problem when trying to reset the password.";
         public const string LinkExpired = "The link has expired.";
         public const string LoginAttemptsExceeded = "The limit of login attempts has been exceeded.";
@@ -15,8 +14,6 @@
         public const string UserDoesNotHaveRights = "The user does not have the following rights:";
         public const string AccessDenied = "Access denied.";
         public const string ServerConfigurationError = "An unexpected error occurred on the server configuration side";
-
-        //CRUD
         public const string EntityNotFound = "{0} was not found.";
     }
 }

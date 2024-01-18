@@ -37,6 +37,8 @@ const actions = {
     commit('RemoveAntiForgeryToken')
     commit('ResetProjectState')
     commit('ResetProjectsState')
+    commit('ResetPromptState')
+    commit('ResetPromptsState')
     commit('LogOut')
   },
   async ConfirmEmail(_, payload){

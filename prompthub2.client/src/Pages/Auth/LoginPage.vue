@@ -47,7 +47,7 @@
             Sign In
           </button>
           <RouterLink :to="{name: 'forgot_password'}">
-            Forgot password? Click Here!
+            {{ ForgotPassword }}
           </RouterLink>
         </div>
         <FormMessage 
@@ -60,13 +60,14 @@
       <RouterLink 
         :to="{name: 'register'}"
       >
-        Don't have an account? Click here!
+        {{ CreateAccount }}
       </RouterLink>
     </div>
   </div>
 </template>
 
 <script setup>
+import { ForgotPassword, CreateAccount } from '@/constants/inlineMessages'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { ref, reactive } from 'vue'
@@ -75,8 +76,6 @@ import FormMessage from '@/components/FormMessage.vue'
 
 const router = useRouter()
 const store = useStore()
-
-const LogIn = async (form) => await store.dispatch('LogIn', form)
 const message = ref(null)
 const status = ref(null)
 
@@ -87,14 +86,16 @@ const form = reactive({
 })
 
 const auth = async () => {
-  const response = await LogIn(form)
-  message.value = response.message
-  status.value = response.status
-  form.errors = response.errors ?? {}
+  const result = await LogIn(form)
+  message.value = result.message
+  status.value = result.status
+  form.errors = result.errors ?? {}
 
-  if(!response.errors){
+  if(!result.errors){
     form.errors = {}
     router.push({ name: 'home' })
   }
 }
+
+const LogIn = async (form) => await store.dispatch('LogIn', form)
 </script>

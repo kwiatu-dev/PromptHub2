@@ -26,7 +26,7 @@
             <div class="w-8 h-8 bg-gray-200 rounded-full" />
           </button>
           <div 
-            class="z-50 my-4 text-base list-none bg-gray-700 divide-y divide-gray-600 shadow absolute" 
+            class="z-10 my-4 text-base list-none bg-gray-700 divide-y divide-gray-600 shadow absolute" 
             :class="[showUserMenu ? 'block' : 'hidden']" 
             style="right: calc(100% - 32px)"
           >

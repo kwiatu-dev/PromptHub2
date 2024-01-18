@@ -1,7 +1,13 @@
 <template>
-  <div v-if="errors && errors.length" class="input-error">
+  <div 
+    v-if="errors && errors.length" 
+    class="input-error"
+  >
     <ul>
-      <li v-for="(error, index) in errors" :key="index">
+      <li 
+        v-for="(error, index) in errors" 
+        :key="index"
+      >
         {{ error }}
       </li>
     </ul>

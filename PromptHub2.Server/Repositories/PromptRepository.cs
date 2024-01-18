@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PromptHub2.Server.Constants;
 using PromptHub2.Server.Data;
 using PromptHub2.Server.Interfaces;
 using PromptHub2.Server.Models.Entites;
@@ -69,9 +70,11 @@ namespace PromptHub2.Server.Repositories
                     Description = request.Description,
                     CreatedById = user.Id,
                     UpdatedById = user.Id,
+                    Model = LM.DefaultModel
                 };
 
                 var promptEntry = _dbContext.Prompts.Add(prompt);
+                await _dbContext.SaveChangesAsync();
 
                 return promptEntry.Entity;
             }
