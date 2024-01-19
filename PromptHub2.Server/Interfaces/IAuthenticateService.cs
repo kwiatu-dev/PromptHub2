@@ -7,7 +7,7 @@ namespace PromptHub2.Server.Interfaces
     {
         Task<LoginResult> LoginAsync(LoginRequest request);
         Task<RegisterResult> RegisterAsync(RegisterRequest request);
+        Task<LoginResult> RefreshTokenAsync(string? userEmail, string? refreshToken);
         Task<ConfirmEmailResult> ConfirmEmailAsync(ConfirmEmailRequest request);
-
     }
 }

@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using PromptHub2.Server.Constants;
 using PromptHub2.Server.Interfaces;
+using PromptHub2.Server.Models.Entites.Extensions;
 using PromptHub2.Server.Models.Requests;
 using PromptHub2.Server.Models.Responses;
 
@@ -25,7 +28,11 @@ namespace PromptHub2.Server.Controllers
 
             if (result.IsSuccess)
             {
-                return Ok(new { token = result.Token });
+                Response.Cookies.Append(Cookies.AccessToken, result.Token);
+                Response.Cookies.Append(Cookies.RefreshToken, result.RefreshToken);
+                Response.Cookies.Append(Cookies.UserEmail, result.Email);
+
+                return Ok(result.User.GenerateResponse());
             }
 
             return StatusCode(result.StatusCode, new ErrorResponse
@@ -54,6 +61,32 @@ namespace PromptHub2.Server.Controllers
             {
                 Message = result.Message,
                 Errors = result.Errors,
+            });
+        }
+
+        [HttpGet]
+        [IgnoreAntiforgeryToken]
+        [Route("Refresh")]
+        public async Task<ActionResult> Refresh()
+        {
+            if (Request.Cookies.TryGetValue(Cookies.UserEmail, out var userEmail) &&
+               Request.Cookies.TryGetValue(Cookies.RefreshToken, out var refreshToken))
+            {
+                var result = await _authenticateService.RefreshTokenAsync(userEmail, refreshToken);
+
+                if (result.IsSuccess)
+                {
+                    Response.Cookies.Append(Cookies.AccessToken, result.Token);
+                    Response.Cookies.Append(Cookies.RefreshToken, result.RefreshToken);
+                    Response.Cookies.Append(Cookies.UserEmail, result.Email);
+
+                    return Ok(result.User.GenerateResponse());
+                }
+            }
+
+            return Unauthorized(new ErrorResponse
+            {
+                Message = Errors.RefreshTokenFail,
             });
         }
 

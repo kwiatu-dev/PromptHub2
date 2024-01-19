@@ -8,7 +8,7 @@ namespace PromptHub2.Server.Models.Entites.Extensions
     {
         public static ProjectResponse? GenerateResponse(this Project project, bool includePrompts = false)
         {
-            if(project != null)
+            if (project != null)
             {
                 return new ProjectResponse(
                     project.Id,
@@ -26,7 +26,7 @@ namespace PromptHub2.Server.Models.Entites.Extensions
 
         public static List<ProjectResponse?> GenerateResponse(this List<Project> projects, bool includePrompts = false)
         {
-            if(projects != null)
+            if (projects != null)
             {
                 return projects.Select(p => p.GenerateResponse(includePrompts)).ToList();
             }
@@ -36,7 +36,7 @@ namespace PromptHub2.Server.Models.Entites.Extensions
 
         public static PromptResponse? GenerateResponse(this Prompt prompt, bool includeMessages = true)
         {
-            if(prompt != null)
+            if (prompt != null)
             {
                 return new PromptResponse(
                     prompt.Id,
@@ -63,6 +63,18 @@ namespace PromptHub2.Server.Models.Entites.Extensions
             }
 
             return new();
+        }
+
+        public static UserResponse? GenerateResponse(this User? user) 
+        {
+            if (user != null)
+            {
+                return new UserResponse(
+                    user.Id,
+                    user.Email ?? "");
+            }
+
+            return null;
         }
     }
 }

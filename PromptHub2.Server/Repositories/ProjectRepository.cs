@@ -64,7 +64,7 @@ namespace PromptHub2.Server.Repositories
         {
             var project = await GetByIdAsync(guid);
 
-            if(project != null)
+            if (project != null)
             {
                 _dbContext.Remove(project);
                 await _dbContext.SaveChangesAsync();

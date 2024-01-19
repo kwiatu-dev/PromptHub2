@@ -33,7 +33,7 @@ namespace PromptHub2.Server.Controllers
         {
             var prompt = await _promptRepository.GetByIdAsync(guid);
 
-            if(prompt != null)
+            if (prompt != null)
             {
                 return Ok(prompt.GenerateResponse());
             }
@@ -50,7 +50,7 @@ namespace PromptHub2.Server.Controllers
         {
             var prompt = await _promptRepository.CreateAsync(guid, request);
 
-            if(prompt != null)
+            if (prompt != null)
             {
                 return Created(nameof(GetById), prompt.GenerateResponse());
             }
@@ -64,7 +64,7 @@ namespace PromptHub2.Server.Controllers
         {
             var prompt = await _promptRepository.UpdateAsync(guid, request);
 
-            if(prompt != null)
+            if (prompt != null)
             {
                 return Ok(prompt.GenerateResponse());
             }

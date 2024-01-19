@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Asn1.Ocsp;
 using PromptHub2.Server.Constants;
 using PromptHub2.Server.Controllers;
 using PromptHub2.Server.Interfaces;
 using PromptHub2.Server.Models.Data;
+using PromptHub2.Server.Models.Entites;
 using PromptHub2.Server.Models.Requests;
 using PromptHub2.Server.Models.Results;
 using System.IdentityModel.Tokens.Jwt;
@@ -15,21 +17,23 @@ namespace PromptHub2.Server.Services
 {
     public class AuthenticateService : IAuthenticateService
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
         private readonly IMailService _mailService;
+        private readonly JwtTokenCreatorService _jwtTokenCreatorService;
         private readonly IConfiguration _configuration;
 
         public AuthenticateService(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
+            UserManager<User> userManager,
+            SignInManager<User> signInManager,
             IMailService mailService,
-            IConfiguration configuration
-            )
+            JwtTokenCreatorService jwtTokenCreatorService,
+            IConfiguration configuration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _mailService = mailService;
+            _jwtTokenCreatorService = jwtTokenCreatorService;
             _configuration = configuration;
         }
 
@@ -43,23 +47,20 @@ namespace PromptHub2.Server.Services
 
                 if (result.Succeeded)
                 {
-                    var userRoles = await _userManager.GetRolesAsync(user);
+                    var token = await _jwtTokenCreatorService.CreateTokenAsync(user);
 
-                    var authClaims = new List<Claim>
-                    {
-                        new(ClaimTypes.NameIdentifier, user.Id),
-                        new(ClaimTypes.Email, request.Email),
-                        new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                    user.RefreshToken = Guid.NewGuid().ToString();
+
+                    await _userManager.UpdateAsync(user);
+
+                    return new LoginResult { 
+                        IsSuccess = true, 
+                        Token = token,
+                        RefreshToken = user.RefreshToken,
+                        Email = user.Email ?? "",
+                        User = user,
+                        Message = Messages.LoginSuccessful
                     };
-
-                    foreach (var role in userRoles)
-                    {
-                        authClaims.Add(new Claim(ClaimTypes.Role, role));
-                    }
-
-                    var token = CreateToken(authClaims);
-
-                    return new LoginResult { IsSuccess = true, Token = new JwtSecurityTokenHandler().WriteToken(token) };
                 }
                 else if (result.IsLockedOut)
                 {
@@ -103,7 +104,7 @@ namespace PromptHub2.Server.Services
 
         public async Task<RegisterResult> RegisterAsync(RegisterRequest request)
         {
-            var user = new IdentityUser
+            var user = new User
             {
                 UserName = request.Email,
                 Email = request.Email
@@ -146,6 +147,34 @@ namespace PromptHub2.Server.Services
             };
         }
 
+        public async Task<LoginResult> RefreshTokenAsync(string? userEmail, string? refreshToken)
+        {
+            var user = _userManager.Users.FirstOrDefault(u => u.Email == userEmail && u.RefreshToken == refreshToken);
+
+            if (user != null)
+            {
+                var token = await _jwtTokenCreatorService.CreateTokenAsync(user);
+                user.RefreshToken = Guid.NewGuid().ToString();
+                await _userManager.UpdateAsync(user);
+
+                return new LoginResult()
+                {
+                    IsSuccess = true,
+                    Token = token,
+                    RefreshToken = user.RefreshToken,
+                    Email = user.Email ?? "",
+                    User = user,
+                    Message = Messages.RefreshTokenSuccessful,
+                };
+            }
+
+            return new LoginResult()
+            {
+                IsSuccess = false,
+                Message = Errors.RefreshTokenFail,
+            };
+        }
+
         public async Task<ConfirmEmailResult> ConfirmEmailAsync(ConfirmEmailRequest request)
         {
             var user = await _userManager.FindByEmailAsync(request.Email);
@@ -169,22 +198,6 @@ namespace PromptHub2.Server.Services
                 Message = Errors.LinkExpired,
                 StatusCode = StatusCodes.Status400BadRequest
             };
-        }
-
-        private JwtSecurityToken CreateToken(List<Claim> authClaims)
-        {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"] ?? ""));
-
-            var token = new JwtSecurityToken(
-                claims: authClaims,
-                notBefore: DateTime.UtcNow,
-                issuer: _configuration["JWT:ValidIssuer"],
-                audience: _configuration["JWT:ValidAudience"],
-                expires: DateTime.Now.AddDays(7),
-                signingCredentials: new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature)
-            );
-
-            return token;
         }
     }
 }

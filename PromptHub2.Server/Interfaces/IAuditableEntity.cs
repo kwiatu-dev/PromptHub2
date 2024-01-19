@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using PromptHub2.Server.Models.Entites;
 
 namespace PromptHub2.Server.Interfaces
 {
     public interface IAuditableEntity
     {
         DateTime? CreatedAt { get; set; }
-        IdentityUser? CreatedBy { get; set; }
+        User? CreatedBy { get; set; }
         DateTime? UpdatedAt { get; set; }
-        IdentityUser? UpdatedBy { get; set; }
+        User? UpdatedBy { get; set; }
     }
 }

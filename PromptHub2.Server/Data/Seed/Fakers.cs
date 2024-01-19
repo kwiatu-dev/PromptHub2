@@ -7,16 +7,16 @@ namespace PromptHub2.Server.Data.Seed
 {
     public class Fakers
     {
-        public static Faker<IdentityUser> GetUserGenerator()
+        public static Faker<User> GetUserGenerator()
         {
-            var userFaker = new Faker<IdentityUser>()
+            var userFaker = new Faker<User>()
                 .RuleFor(u => u.Id, f => Guid.NewGuid().ToString())
                 .RuleFor(u => u.UserName, f => f.Internet.Email())
                 .RuleFor(u => u.NormalizedUserName, (f, u) => u.UserName?.ToUpper())
                 .RuleFor(u => u.Email, (f, u) => u.UserName)
                 .RuleFor(u => u.NormalizedEmail, (f, u) => u.Email?.ToUpper())
                 .RuleFor(u => u.EmailConfirmed, f => f.Random.Bool())
-                .RuleFor(u => u.PasswordHash, (f, u) => new PasswordHasher<IdentityUser>().HashPassword(u, Constants.Users.PasswordDefault));
+                .RuleFor(u => u.PasswordHash, (f, u) => new PasswordHasher<User>().HashPassword(u, Constants.Users.PasswordDefault));
 
             return userFaker;
         }
@@ -44,7 +44,7 @@ namespace PromptHub2.Server.Data.Seed
             return promptFaker;
         }
 
-        public static Faker<Project> GetProjectGenerator(List<IdentityUser> users)
+        public static Faker<Project> GetProjectGenerator(List<User> users)
         {
             var projectFaker = new Faker<Project>()
                 .RuleFor(p => p.Id, f => Guid.NewGuid().ToString())

@@ -7,5 +7,7 @@
         public const string UserCreated = "The user has been successfully created.";
         public const string EmailVerifiedSuccessful = "The email address has been successfully verified.";
         public const string EntityDeleted = "{0} was removed successfully.";
+        public const string LoginSuccessful = "Login successful.";
+        public const string RefreshTokenSuccessful = "Refresh token successful.";
     }
 }

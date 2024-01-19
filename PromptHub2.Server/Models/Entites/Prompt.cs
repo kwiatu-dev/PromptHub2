@@ -39,21 +39,21 @@ namespace PromptHub2.Server.Models.Entites
         public DateTime? CreatedAt { get; set; }
 
         [Required]
-        [ForeignKey("IdentityUser")]
+        [ForeignKey("User")]
         public string? CreatedById { get; set; }
 
         [JsonIgnore]
-        public virtual IdentityUser? CreatedBy { get; set; }
+        public virtual User? CreatedBy { get; set; }
 
         [Required]
         public DateTime? UpdatedAt { get; set; }
 
         [Required]
-        [ForeignKey("IdentityUser")]
+        [ForeignKey("User")]
         public string? UpdatedById { get; set; }
 
         [JsonIgnore]
-        public virtual IdentityUser? UpdatedBy { get; set; }
+        public virtual User? UpdatedBy { get; set; }
 
         [Required]
         public bool IsDeleted { get; set; }
@@ -69,7 +69,7 @@ namespace PromptHub2.Server.Models.Entites
         public string? Content { get; set; }
 
         public static implicit operator Message((string Role, string Content) values) =>
-            new Message { Role = values.Role, Content = values.Content };
+            new() { Role = values.Role, Content = values.Content };
 
         public static implicit operator (string? Role, string? Content)(Message message) =>
             (message.Role, message.Content);

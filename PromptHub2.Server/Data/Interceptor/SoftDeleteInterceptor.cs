@@ -47,7 +47,7 @@ public class SoftDeleteInterceptor : SaveChangesInterceptor
 
         foreach (var entry in entries)
         {
-            if(entry.State == EntityState.Deleted)
+            if (entry.State == EntityState.Deleted)
             {
                 entry.State = EntityState.Modified;
                 entry.Entity.IsDeleted = true;

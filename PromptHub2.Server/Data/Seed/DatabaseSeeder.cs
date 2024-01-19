@@ -15,7 +15,7 @@ namespace PromptHub2.Server.Data.Seed
 
             builder.Entity<IdentityRole>().HasData(roles);
 
-            var administrator = new IdentityUser
+            var administrator = new User
             {
                 Id = Guid.NewGuid().ToString(),
                 UserName = "fi.kwiatkowski@gmail.com",
@@ -25,11 +25,11 @@ namespace PromptHub2.Server.Data.Seed
                 EmailConfirmed = true,
             };
 
-            administrator.PasswordHash = new PasswordHasher<IdentityUser>().HashPassword(administrator, "Karteczka123!");
+            administrator.PasswordHash = new PasswordHasher<User>().HashPassword(administrator, "Karteczka123!");
 
             var users = Fakers.GetUserGenerator().Generate(10);
             users.Add(administrator);
-            builder.Entity<IdentityUser>().HasData(users);
+            builder.Entity<User>().HasData(users);
 
             builder.Entity<IdentityUserRole<string>>().HasData(
                 new IdentityUserRole<string>

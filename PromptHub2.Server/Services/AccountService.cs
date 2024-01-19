@@ -2,6 +2,7 @@
 using PromptHub2.Server.Controllers;
 using PromptHub2.Server.Interfaces;
 using PromptHub2.Server.Models.Data;
+using PromptHub2.Server.Models.Entites;
 using PromptHub2.Server.Models.Requests;
 using System.Web;
 
@@ -9,14 +10,14 @@ namespace PromptHub2.Server.Services
 {
     public class AccountService : IAccountService
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
         private readonly IMailService _mailService;
         private readonly IConfiguration _configuration;
 
         public AccountService(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
+            UserManager<User> userManager,
+            SignInManager<User> signInManager,
             IMailService mailService,
             IConfiguration configuration)
         {

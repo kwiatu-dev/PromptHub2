@@ -51,7 +51,7 @@ namespace PromptHub2.Server.Controllers
         {
             var project = await _projectRepository.CreateAsync(request);
 
-            if(project != null)
+            if (project != null)
             {
                 return Created(nameof(GetById), project.GenerateResponse());
             }
@@ -65,7 +65,7 @@ namespace PromptHub2.Server.Controllers
         {
             var project = await _projectRepository.UpdateAsync(guid, request);
 
-            if(project != null)
+            if (project != null)
             {
                 return Ok(project.GenerateResponse());
             }

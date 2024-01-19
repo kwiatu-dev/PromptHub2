@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using PromptHub2.Server.Data;
+using PromptHub2.Server.Models.Entites;
 
 namespace PromptHub2.Server.Configuration.Data
 {
@@ -9,7 +10,7 @@ namespace PromptHub2.Server.Configuration.Data
             this IServiceCollection services, 
             IConfiguration configuration)
         {
-            services.AddIdentity<IdentityUser, IdentityRole>(options =>
+            services.AddIdentity<User, IdentityRole>(options =>
             {
                 options.Password.RequiredLength = 8;
                 options.Password.RequireDigit = true;

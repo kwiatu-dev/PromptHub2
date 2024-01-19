@@ -37,7 +37,7 @@ namespace PromptHub2.Server.Controllers
         {
             bool result = await _accountService.ResetPasswordAsync(request);
 
-            if(result)
+            if (result)
             {
                 return Ok(new SuccedResponse
                 {

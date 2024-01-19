@@ -19,7 +19,7 @@ namespace PromptHub2.Server.Helpers
 
         public static Dictionary<string, string[]> ExtractFailedRequirements(AuthorizationFailure failure)
         {
-            if(failure != null)
+            if (failure != null)
             {
                 var errors = failure.FailedRequirements
                     .Select(failedRequirement => DescribeRequirement(failedRequirement))
@@ -34,7 +34,7 @@ namespace PromptHub2.Server.Helpers
         private static string DescribeRequirement(IAuthorizationRequirement requirement)
         {
 
-            if(requirement is RolesAuthorizationRequirement rolesRequirement)
+            if (requirement is RolesAuthorizationRequirement rolesRequirement)
             {
                 return $"{Errors.UserDoesNotHaveRights} {string.Join(", ", rolesRequirement.AllowedRoles)}";
             }

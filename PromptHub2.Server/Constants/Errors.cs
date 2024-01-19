@@ -15,5 +15,6 @@
         public const string AccessDenied = "Access denied.";
         public const string ServerConfigurationError = "An unexpected error occurred on the server configuration side";
         public const string EntityNotFound = "{0} was not found.";
+        public const string RefreshTokenFail = "Refresh token fail.";
     }
 }

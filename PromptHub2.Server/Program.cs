@@ -13,6 +13,7 @@ using PromptHub2.Server.Configuration.Extensions;
 using PromptHub2.Server.Configuration;
 using PromptHub2.Server.Data.Interceptor;
 using PromptHub2.Server.Repositories;
+using PromptHub2.Server.Configuration.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configuration = builder.Configuration;
@@ -26,12 +27,14 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IPromptRepository, PromptRepository>();
 builder.Services.AddTransient<IMailService, MailService>();
+builder.Services.AddTransient<JwtTokenCreatorService>();
 
 builder.Services.AddCorsConfiguration(configuration);
 builder.Services.AddDbContextConfiguration(configuration);
 builder.Services.AddIdentityConfiguration(configuration);
 builder.Services.AddAuthenticationConfiguration(configuration);
 builder.Services.AddAuthorizationConfiguration(configuration);
+builder.Services.AddCookiesConfiguration(configuration);
 builder.Services.AddExtensionsConfiguration(configuration);
 builder.Services.AddAppConfiguration(configuration);
 builder.Services.AddHttpContextAccessor();
@@ -50,6 +53,7 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 app.UseCors(Cors.AllowClientCors);
+app.UseCookiePolicy();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
