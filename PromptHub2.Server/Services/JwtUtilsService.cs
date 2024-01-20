@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Asn1.Ocsp;
@@ -18,8 +19,8 @@ namespace PromptHub2.Server.Services
         private readonly UserManager<User> _userManager;
         public JwtUtilsService(
             UserManager<User> userManager,
-            IOptions<JwtUtilsSettings> jwtSettingsOptions) 
-        { 
+            IOptions<JwtUtilsSettings> jwtSettingsOptions)
+        {
             _userManager = userManager;
             _jwtUtilsSettings = jwtSettingsOptions.Value;
         }
@@ -54,42 +55,11 @@ namespace PromptHub2.Server.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-        public string? ValidateAccessToken(string token)
-        {
-            if (!string.IsNullOrEmpty(token)) 
-            {
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtUtilsSettings.Secret));
-
-                try
-                {
-                    tokenHandler.ValidateToken(token, new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = _jwtUtilsSettings.ValidIssuer,
-                        ValidAudience = _jwtUtilsSettings.ValidAudience,
-                        IssuerSigningKey = securityKey,
-                        ClockSkew = TimeSpan.Zero,
-                    }, out SecurityToken validatedToken);
-
-                    var jwtToken = (JwtSecurityToken)validatedToken;
-                    var userId = jwtToken.Claims.FirstOrDefault(c => c.ValueType == ClaimTypes.NameIdentifier)?.Value;
-
-                    return userId;
-                }
-                catch { }
-            }
-
-            return null;
-        }
 
         public RefreshToken CreateRefreshToken(string ipAddress)
         {
-            RefreshToken refreshToken = new() 
-            { 
+            RefreshToken refreshToken = new()
+            {
                 Id = Guid.NewGuid().ToString(),
                 Token = GetUniqueToken(),
                 CreatedAt = DateTime.UtcNow,
@@ -102,9 +72,9 @@ namespace PromptHub2.Server.Services
             string GetUniqueToken()
             {
                 var token = Guid.NewGuid().ToString();
-                var isUnique = _userManager.Users.Any(u => u.RefreshTokens.Any(t => t.Token == token));
+                var tokenExist = _userManager.Users.Any(u => u.RefreshTokens.Any(t => t.Token == token));
 
-                if(!isUnique)
+                if (tokenExist)
                 {
                     return GetUniqueToken();
                 }
@@ -115,8 +85,8 @@ namespace PromptHub2.Server.Services
 
         public void RemoveObsoleteRefreshTokensAsync(User user)
         {
-            user.RefreshTokens.RemoveAll(t => 
-                !t.IsActive && 
+            user.RefreshTokens.RemoveAll(t =>
+                !t.IsActive &&
                 t.CreatedAt.AddDays(_jwtUtilsSettings.RefreshTokenTTL) <= DateTime.UtcNow);
         }
 
@@ -138,7 +108,7 @@ namespace PromptHub2.Server.Services
                 {
                     if (childRefreshToken.IsActive)
                     {
-                        RevokeRefreshToken(childRefreshToken, reasonRevoked, ipAddress);
+                        RevokeRefreshToken(childRefreshToken, reasonRevoked: reasonRevoked, ipAddress: ipAddress);
                     }
 
                     RevokeDescendantRefreshTokens(user, childRefreshToken, reasonRevoked, ipAddress);
@@ -149,16 +119,16 @@ namespace PromptHub2.Server.Services
         public RefreshToken RotateRefreshToken(RefreshToken refreshToken, string ipAddress)
         {
             var newRefreshToken = CreateRefreshToken(ipAddress);
-            RevokeRefreshToken(refreshToken, newRefreshToken.Token, "Replaced by new token", ipAddress);
+            RevokeRefreshToken(refreshToken, newRefreshToken.Token, Messages.RefreshTokenRotate, ipAddress);
 
             return newRefreshToken;
         }
 
         public async Task<bool> RevokeTokenAsync(string token, string reasonRevoked, string ipAddress)
         {
-            var user = _userManager.Users.SingleOrDefault(u => u.RefreshTokens.Any(t => t.Token == token));
+            var user = GetUserByToken(token);
 
-            if (user != null) 
+            if (user != null)
             {
                 var refreshToken = user.RefreshTokens.Single(t => t.Token == token);
 
@@ -172,6 +142,14 @@ namespace PromptHub2.Server.Services
             }
 
             return false;
+        }
+
+        public User? GetUserByToken(string token)
+        {
+            return _userManager.Users
+                .Include(u => u.RefreshTokens)
+                .SingleOrDefault(u =>
+                    u.RefreshTokens.Any(t => t.Token == token));
         }
     }
 }

@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using PromptHub2.Server.Constants;
 using PromptHub2.Server.Interfaces;
 using PromptHub2.Server.Models.Entites.Extensions;
@@ -21,18 +23,20 @@ namespace PromptHub2.Server.Controllers
 
         [HttpPost]
         [IgnoreAntiforgeryToken]
-        [Route("Login")]
-        public async Task<IActionResult> Login(LoginRequest request)
+        [Route("LogIn")]
+        public async Task<IActionResult> LogIn(LoginRequest request)
         {
-            var result = await _authenticateService.LoginAsync(request);
+            var result = await _authenticateService.LogInAsync(request, GetIpAddress());
 
             if (result.IsSuccess)
             {
-                Response.Cookies.Append(Cookies.AccessToken, result.Token);
-                Response.Cookies.Append(Cookies.RefreshToken, result.RefreshToken);
-                Response.Cookies.Append(Cookies.UserEmail, result.Email);
+                Response.Cookies.Append(Cookies.RefreshToken, result?.RefreshToken?.Token ?? "");
 
-                return Ok(result.User.GenerateResponse());
+                return Ok(new
+                {
+                    user = result?.User,
+                    token = result?.AccessToken
+                });
             }
 
             return StatusCode(result.StatusCode, new ErrorResponse
@@ -69,24 +73,49 @@ namespace PromptHub2.Server.Controllers
         [Route("Refresh")]
         public async Task<ActionResult> Refresh()
         {
-            if (Request.Cookies.TryGetValue(Cookies.UserEmail, out var userEmail) &&
-               Request.Cookies.TryGetValue(Cookies.RefreshToken, out var refreshToken))
+            if (Request.Cookies.TryGetValue(Cookies.RefreshToken, out var token))
             {
-                var result = await _authenticateService.RefreshTokenAsync(userEmail, refreshToken);
+                var result = await _authenticateService.RefreshTokenAsync(token, GetIpAddress());
 
                 if (result.IsSuccess)
                 {
-                    Response.Cookies.Append(Cookies.AccessToken, result.Token);
-                    Response.Cookies.Append(Cookies.RefreshToken, result.RefreshToken);
-                    Response.Cookies.Append(Cookies.UserEmail, result.Email);
+                    Response.Cookies.Append(Cookies.RefreshToken, result?.RefreshToken?.Token ?? "");
 
-                    return Ok(result.User.GenerateResponse());
+                    return Ok(new
+                    {
+                        user = result?.User,
+                        token = result?.AccessToken
+                    });
                 }
             }
 
             return Unauthorized(new ErrorResponse
             {
-                Message = Errors.RefreshTokenFail,
+                Message = Errors.RefreshTokenFailed,
+            });
+        }
+
+        [Authorize]
+        [HttpDelete]
+        [Route("LogOut")]
+        public async Task<IActionResult> LogOut()
+        {
+            if (Request.Cookies.TryGetValue(Cookies.RefreshToken, out var token))
+            {
+                var result = await _authenticateService.LogOutAsync(token, GetIpAddress());
+
+                if (result)
+                {
+                    return Ok(new SuccedResponse
+                    {
+                        Message = Messages.LogOutSuccessful
+                    });
+                }
+            }
+
+            return BadRequest(new ErrorResponse
+            {
+                Message = Errors.LogOutFailed,
             });
         }
 
@@ -110,6 +139,25 @@ namespace PromptHub2.Server.Controllers
             {
                 Message = result.Message,
             });
+        }
+
+        private string GetIpAddress()
+        {
+            if (Request.Headers.TryGetValue("X-Forwarded-For", out StringValues header))
+            {
+                return header.ToString();
+            }
+            else
+            {
+                var remoteIpAddress = HttpContext.Connection.RemoteIpAddress;
+
+                if (remoteIpAddress != null)
+                {
+                    return remoteIpAddress.MapToIPv4().ToString();
+                }
+                
+                return string.Empty;
+            }
         }
     }
 }

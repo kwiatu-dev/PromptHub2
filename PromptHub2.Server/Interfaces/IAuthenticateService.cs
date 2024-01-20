@@ -5,9 +5,10 @@ namespace PromptHub2.Server.Interfaces
 {
     public interface IAuthenticateService
     {
-        Task<LoginResult> LoginAsync(LoginRequest request, string ipAddress);
+        Task<LoginResult> LogInAsync(LoginRequest request, string ipAddress);
         Task<RegisterResult> RegisterAsync(RegisterRequest request);
         Task<LoginResult> RefreshTokenAsync(string token, string ipAddress);
         Task<ConfirmEmailResult> ConfirmEmailAsync(ConfirmEmailRequest request);
+        Task<bool> LogOutAsync(string token, string ipAddress);
     }
 }

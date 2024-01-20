@@ -27,7 +27,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IPromptRepository, PromptRepository>();
 builder.Services.AddTransient<IMailService, MailService>();
-builder.Services.AddTransient<JwtUtilsService>();
+builder.Services.AddScoped<IJwtUtilsService, JwtUtilsService>();
 
 builder.Services.AddCorsConfiguration(configuration);
 builder.Services.AddDbContextConfiguration(configuration);

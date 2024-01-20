@@ -12,7 +12,7 @@ const storageEventListener = (event) => {
     }
     else if(event?.key && event.key == LOGIN_EVENT){
       if(!store.getters.isAuthenticated){
-        store.dispatch('LogInFromCookie')
+        store.dispatch('TryToLogInWithRefreshToken')
         router.push({ name: 'home' })
       }
     }

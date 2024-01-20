@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Asn1.Ocsp;
 using PromptHub2.Server.Constants;
@@ -6,6 +7,7 @@ using PromptHub2.Server.Controllers;
 using PromptHub2.Server.Interfaces;
 using PromptHub2.Server.Models.Data;
 using PromptHub2.Server.Models.Entites;
+using PromptHub2.Server.Models.Entites.Extensions;
 using PromptHub2.Server.Models.Requests;
 using PromptHub2.Server.Models.Results;
 using System.IdentityModel.Tokens.Jwt;
@@ -21,14 +23,14 @@ namespace PromptHub2.Server.Services
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly IMailService _mailService;
-        private readonly JwtUtilsService _jwtUtilsService;
+        private readonly IJwtUtilsService _jwtUtilsService;
         private readonly IConfiguration _configuration;
 
         public AuthenticateService(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             IMailService mailService,
-            JwtUtilsService jwtTokenCreatorService,
+            IJwtUtilsService jwtTokenCreatorService,
             IConfiguration configuration)
         {
             _userManager = userManager;
@@ -38,7 +40,7 @@ namespace PromptHub2.Server.Services
             _configuration = configuration;
         }
 
-        public async Task<LoginResult> LoginAsync(LoginRequest request, string ipAddress)
+        public async Task<LoginResult> LogInAsync(LoginRequest request, string ipAddress)
         {
             var user = await _userManager.FindByEmailAsync(request.Email);
 
@@ -58,7 +60,7 @@ namespace PromptHub2.Server.Services
                         IsSuccess = true, 
                         AccessToken = accessToken,
                         RefreshToken = refreshToken,
-                        User = user,
+                        User = await user.GenerateResponse(_userManager),
                         Message = Messages.LoginSuccessful
                     };
                 }
@@ -149,17 +151,18 @@ namespace PromptHub2.Server.Services
 
         public async Task<LoginResult> RefreshTokenAsync(string token, string ipAddress)
         {
-            var user = _userManager.Users.FirstOrDefault(u => u.RefreshTokens.Any(t => t.Token == token));
+            var user = _jwtUtilsService.GetUserByToken(token);
 
             if (user != null)
             {
-                var refreshToken = user.RefreshTokens.FirstOrDefault(t => t.Token == token);
+                var refreshToken = user.RefreshTokens.SingleOrDefault(t => t.Token == token);
 
                 if (refreshToken != null)
                 {
                     if (refreshToken.IsRevoked)
                     {
-                        _jwtUtilsService.RevokeDescendantRefreshTokens(user, refreshToken, $"Attempted reuse of revoked ancestor token: {token}", ipAddress);
+                        _jwtUtilsService.RevokeDescendantRefreshTokens(user, refreshToken, string.Format(Messages.ReuseRevokedToken, token), ipAddress);
+                        await _userManager.UpdateAsync(user);
                     }
 
                     if (refreshToken.IsActive)
@@ -175,7 +178,7 @@ namespace PromptHub2.Server.Services
                             IsSuccess = true,
                             AccessToken = newAccessToken,
                             RefreshToken = newRefreshToken,
-                            User = user,
+                            User = await user.GenerateResponse(_userManager),
                             Message = Messages.RefreshTokenSuccessful,
                         };
                     }
@@ -185,11 +188,11 @@ namespace PromptHub2.Server.Services
             return new LoginResult()
             {
                 IsSuccess = false,
-                Message = Errors.RefreshTokenFail,
+                Message = Errors.RefreshTokenFailed,
             };
         }
 
-        public async Task<bool> LogOut(string token, string ipAddress)
+        public async Task<bool> LogOutAsync(string token, string ipAddress)
         {
             return await _jwtUtilsService.RevokeTokenAsync(token, "LogOut", ipAddress);
         }

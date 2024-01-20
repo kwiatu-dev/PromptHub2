@@ -95,7 +95,9 @@ router.beforeEach((to, from, next) => {
 
   if(roles){
     if(isAuthenticated){
-      if(roles.includes(user.role)){
+      if(roles.some(role => 
+        user?.roles && user?.roles.includes(role)))
+      {
         next()
         return
       }
@@ -121,17 +123,6 @@ router.beforeEach((to, from, next) => {
     return
   }
   next()
-})
-
-// eslint-disable-next-line no-unused-vars
-router.beforeEach(async (_) => {
-  const isAuthenticated = store.getters.isAuthenticated
-
-  if(isAuthenticated && 
-    !store.getters.StateAntiForgeryToken)
-  {
-    await store.dispatch('GetAntiForgeryToken')
-  }
 })
 
 export default router

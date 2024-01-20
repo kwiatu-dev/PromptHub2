@@ -1,10 +1,11 @@
-import { createStore } from 'vuex'
+
+import '@/helpers/axios.js'
 import auth from '@/store/modules/auth'
 import account from '@/store/modules/account'
 import projects from '@/store/modules/projects'
 import prompts from '@/store/modules/prompts'
 import antiforgery from '@/store/modules/antiforgery'
-import { userSessionPlugin } from '@/store/plugins/userSession'
+import { createStore } from 'vuex'
 
 const store = createStore({
   modules: {
@@ -14,7 +15,7 @@ const store = createStore({
     prompts,
     antiforgery,
   },
-  plugins: [userSessionPlugin],
+  plugins: [],
 })
 
 export default store

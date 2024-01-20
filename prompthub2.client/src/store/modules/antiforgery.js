@@ -8,8 +8,10 @@ const getters = {
   StateAntiForgeryToken: state => state.antiForgeryToken,
 }
 const actions = {
-  async GetAntiForgeryToken({ commit }){
-    if(!state.StateAntiForgeryToken){
+  async GetAntiForgeryToken({ getters, commit }){
+    if(!getters.StateAntiForgeryToken && 
+       getters.isAuthenticated)
+    {
       const { result } = await handleRequest(axios.get, '/antiforgery/token')
 
       if(result?.token){

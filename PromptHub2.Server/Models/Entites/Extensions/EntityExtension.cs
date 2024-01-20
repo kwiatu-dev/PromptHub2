@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualBasic;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.VisualBasic;
 using PromptHub2.Server.Constants;
 using PromptHub2.Server.Models.Responses;
 
@@ -65,13 +66,15 @@ namespace PromptHub2.Server.Models.Entites.Extensions
             return new();
         }
 
-        public static UserResponse? GenerateResponse(this User? user) 
+        public async static Task<UserResponse?> GenerateResponse(this User? user, UserManager<User> userManager) 
         {
             if (user != null)
             {
+                var roles = (await userManager.GetRolesAsync(user)).ToList();
+
                 return new UserResponse(
-                    user.Id,
-                    user.Email ?? "");
+                    user.Email ?? "",
+                    roles);
             }
 
             return null;
