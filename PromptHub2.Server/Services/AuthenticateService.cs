@@ -9,6 +9,7 @@ using PromptHub2.Server.Models.Entites;
 using PromptHub2.Server.Models.Requests;
 using PromptHub2.Server.Models.Results;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 using System.Web;
@@ -20,24 +21,24 @@ namespace PromptHub2.Server.Services
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly IMailService _mailService;
-        private readonly JwtTokenCreatorService _jwtTokenCreatorService;
+        private readonly JwtUtilsService _jwtUtilsService;
         private readonly IConfiguration _configuration;
 
         public AuthenticateService(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             IMailService mailService,
-            JwtTokenCreatorService jwtTokenCreatorService,
+            JwtUtilsService jwtTokenCreatorService,
             IConfiguration configuration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _mailService = mailService;
-            _jwtTokenCreatorService = jwtTokenCreatorService;
+            _jwtUtilsService = jwtTokenCreatorService;
             _configuration = configuration;
         }
 
-        public async Task<LoginResult> LoginAsync(LoginRequest request)
+        public async Task<LoginResult> LoginAsync(LoginRequest request, string ipAddress)
         {
             var user = await _userManager.FindByEmailAsync(request.Email);
 
@@ -47,17 +48,16 @@ namespace PromptHub2.Server.Services
 
                 if (result.Succeeded)
                 {
-                    var token = await _jwtTokenCreatorService.CreateTokenAsync(user);
-
-                    user.RefreshToken = Guid.NewGuid().ToString();
-
+                    var accessToken = await _jwtUtilsService.CreateAccessTokenAsync(user);
+                    var refreshToken = _jwtUtilsService.CreateRefreshToken(ipAddress);
+                    user.RefreshTokens.Add(refreshToken);
+                    _jwtUtilsService.RemoveObsoleteRefreshTokensAsync(user);
                     await _userManager.UpdateAsync(user);
 
                     return new LoginResult { 
                         IsSuccess = true, 
-                        Token = token,
-                        RefreshToken = user.RefreshToken,
-                        Email = user.Email ?? "",
+                        AccessToken = accessToken,
+                        RefreshToken = refreshToken,
                         User = user,
                         Message = Messages.LoginSuccessful
                     };
@@ -147,25 +147,39 @@ namespace PromptHub2.Server.Services
             };
         }
 
-        public async Task<LoginResult> RefreshTokenAsync(string? userEmail, string? refreshToken)
+        public async Task<LoginResult> RefreshTokenAsync(string token, string ipAddress)
         {
-            var user = _userManager.Users.FirstOrDefault(u => u.Email == userEmail && u.RefreshToken == refreshToken);
+            var user = _userManager.Users.FirstOrDefault(u => u.RefreshTokens.Any(t => t.Token == token));
 
             if (user != null)
             {
-                var token = await _jwtTokenCreatorService.CreateTokenAsync(user);
-                user.RefreshToken = Guid.NewGuid().ToString();
-                await _userManager.UpdateAsync(user);
+                var refreshToken = user.RefreshTokens.FirstOrDefault(t => t.Token == token);
 
-                return new LoginResult()
+                if (refreshToken != null)
                 {
-                    IsSuccess = true,
-                    Token = token,
-                    RefreshToken = user.RefreshToken,
-                    Email = user.Email ?? "",
-                    User = user,
-                    Message = Messages.RefreshTokenSuccessful,
-                };
+                    if (refreshToken.IsRevoked)
+                    {
+                        _jwtUtilsService.RevokeDescendantRefreshTokens(user, refreshToken, $"Attempted reuse of revoked ancestor token: {token}", ipAddress);
+                    }
+
+                    if (refreshToken.IsActive)
+                    {
+                        var newAccessToken = await _jwtUtilsService.CreateAccessTokenAsync(user);
+                        var newRefreshToken = _jwtUtilsService.RotateRefreshToken(refreshToken, ipAddress);
+                        user.RefreshTokens.Add(newRefreshToken);
+                        _jwtUtilsService.RemoveObsoleteRefreshTokensAsync(user);
+                        await _userManager.UpdateAsync(user);
+
+                        return new LoginResult()
+                        {
+                            IsSuccess = true,
+                            AccessToken = newAccessToken,
+                            RefreshToken = newRefreshToken,
+                            User = user,
+                            Message = Messages.RefreshTokenSuccessful,
+                        };
+                    }
+                }
             }
 
             return new LoginResult()
@@ -173,6 +187,11 @@ namespace PromptHub2.Server.Services
                 IsSuccess = false,
                 Message = Errors.RefreshTokenFail,
             };
+        }
+
+        public async Task<bool> LogOut(string token, string ipAddress)
+        {
+            return await _jwtUtilsService.RevokeTokenAsync(token, "LogOut", ipAddress);
         }
 
         public async Task<ConfirmEmailResult> ConfirmEmailAsync(ConfirmEmailRequest request)

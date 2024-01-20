@@ -10,7 +10,7 @@ namespace PromptHub2.Server.Configuration
             IConfiguration configuration)
         {
             services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
-            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+            services.Configure<JwtUtilsSettings>(configuration.GetSection("JwtSettings"));
 
             services.Configure<ApiBehaviorOptions>(options =>
             {

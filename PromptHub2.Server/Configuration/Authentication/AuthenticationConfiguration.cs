@@ -14,7 +14,7 @@ namespace PromptHub2.Server.Configuration.Authentication
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            var jwtSettings = new JwtSettings();
+            var jwtSettings = new JwtUtilsSettings();
             configuration.Bind("JwtSettings", jwtSettings);
 
             services.AddAuthentication(options =>
@@ -37,28 +37,13 @@ namespace PromptHub2.Server.Configuration.Authentication
                     ValidIssuer = jwtSettings.ValidIssuer,
                     ValidAudience = jwtSettings.ValidAudience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret)),
-                    ClockSkew = jwtSettings.Expire
+                    ClockSkew = jwtSettings.AccessTokenExpire
                 };
 
                 options.Events = new JwtBearerEvents
                 {
                     OnChallenge = JwtBearerEventHandlers.OnChallenge,
-
-                    OnMessageReceived = context =>
-                    {
-                        if (context.Request.Cookies.ContainsKey(Constants.Cookies.AccessToken))
-                        {
-                            context.Token = context.Request.Cookies[Constants.Cookies.AccessToken];
-                        }
-
-                        return Task.CompletedTask;
-                    }
                 };
-            })
-            .AddCookie(options =>
-            {
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-                options.Cookie.IsEssential = true;
             });
         }
     }

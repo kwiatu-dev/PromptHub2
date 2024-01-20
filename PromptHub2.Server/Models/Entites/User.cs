@@ -4,6 +4,6 @@ namespace PromptHub2.Server.Models.Entites
 {
     public class User : IdentityUser
     {
-        public string? RefreshToken { get; set; }
+        public List<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     }
 }
