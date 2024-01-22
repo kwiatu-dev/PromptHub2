@@ -11,6 +11,7 @@
 import { useStore } from 'vuex'
 
 const store = useStore()
+const emit = defineEmits(['deleted'])
 
 const props = defineProps({
   project: {
@@ -19,5 +20,8 @@ const props = defineProps({
   },
 })
 
-const DeleteProject = async () => await store.dispatch('DeleteProject', props.project.id)
+const DeleteProject = async () => {
+  emit('deleted')
+  await store.dispatch('DeleteProject', props.project.id)
+}
 </script>

@@ -1,7 +1,6 @@
 import router from '@/router/router'
 import store from '@/store'
 import axios from 'axios'
-import cookies from '@/helpers/cookies'
 
 axios.defaults.withCredentials = true
 axios.defaults.baseURL = import.meta.env.VITE_ENDPOINT_URL
@@ -18,19 +17,45 @@ axios.interceptors.request.use(async config => {
   return config
 }, undefined)
 
+let isHandlingError = false
+
 axios.interceptors.response.use(undefined, async error => {
+  if(isHandlingError){
+    return Promise.reject(error)
+  }
+
+  isHandlingError = true
+
   if(error){
     if(error.response.status === 401)
     {
-      router.push({ name: 'login' })
+      await unauthorized(router)
     }
 
     if(error.response.status === 403){
-      router.push({ name: 'home' })
+      forbidden(router)
     }
   }
 
+  isHandlingError = false
+
   return Promise.reject(error)
 })
+
+const unauthorized = async (router) => {
+  const { meta } = router.currentRoute.value
+
+  if(store.getters.isAuthenticated){
+    await store.dispatch('LogOut')
+  }
+
+  if(meta?.guest !== true){
+    router.push({ name: 'login' })
+  }
+}
+
+const forbidden = (router) => {
+  router.push({ name: 'home' })
+}
 
 export default axios

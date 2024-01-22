@@ -1,6 +1,6 @@
 <template>
   <nav class="bg-gray-600">
-    <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+    <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4 relative">
       <RouterLink 
         class="flex items-center space-x-3" 
         :to="{ name: 'home' }"

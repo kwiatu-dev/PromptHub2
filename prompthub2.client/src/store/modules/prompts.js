@@ -1,5 +1,6 @@
 import axios from 'axios'
 import handleRequest from '@/helpers/handleRequest'
+import syncTabs from '@/helpers/syncTabs'
 
 const state = () => ({
   prompt: null,
@@ -48,6 +49,7 @@ const mutations = {
   },
   AddPrompt(state, prompt){
     state.prompts.push(prompt)
+    syncTabs.emitPageChangedEvent()
   },
   DeletePrompt(state, guid){
     if(state.prompts?.length){
@@ -61,6 +63,7 @@ const mutations = {
     if(state.prompt?.id === guid){
       state.prompt = null
     }
+    syncTabs.emitPageChangedEvent()
   },
   ResetPromptState(state){
     state.prompt = null

@@ -19,7 +19,8 @@
     "universal-cookie": "^7.0.0",
     "vue": "^3.3.10",
     "vue-router": "^4.2.5",
-    "vuex": "^4.1.0"
+    "vuex": "^4.1.0",
+    "vuex-multi-tab-state": "^1.0.17"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.5.1",

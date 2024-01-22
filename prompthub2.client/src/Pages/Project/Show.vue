@@ -8,12 +8,14 @@
         v-if="project" 
         :project="project" 
         view="single"
+        @deleted="back"
       />
     </div>
     <div class="w-1/2 md:w-3/5 overflow-y-auto">
       <PromptPage 
         v-if="project" 
         :project="project"
+        @changed="update"
       />
     </div>
   </div>
@@ -24,33 +26,30 @@ import PromptPage from '@/Pages/Prompt/Index.vue'
 import BoxItem from '@/Pages/Project/Index/Components/BoxItem.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import { onMounted, computed, watch } from 'vue'
+import { onMounted, computed } from 'vue'
 
 const router = useRouter()
 const route = useRoute()
 const store = useStore()
 
+store.commit('ResetProjectState')
+
 const { guid } = route.params
 const project = computed(() => store.getters.StateProject)
-const prompts = computed(() => store.getters.StatePrompts)
 
 onMounted(async () => {
   const result = await store.dispatch('GetProject', guid)
 
-  if(result === null){
-    router.push({ name: 'projects' })
-  }
-
-  watch(prompts, async (after, before) => {
-    if(before){
-      await store.dispatch('GetProject', guid)
-    }
-  }, { deep: true })
-})
-
-watch(project, (after) => {
-  if(!after){
+  if(result?.id === undefined){
     router.push({ name: 'projects' })
   }
 })
+
+const back = () => {
+  router.push({ name: 'projects' })
+}
+
+const update = async () => {
+  await store.dispatch('GetProject', guid)
+}
 </script>

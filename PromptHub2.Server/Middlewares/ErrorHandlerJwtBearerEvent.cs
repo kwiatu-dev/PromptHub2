@@ -9,7 +9,7 @@ namespace PromptHub2.Server.Middlewares
         public static Task OnChallenge(JwtBearerChallengeContext context)
         {
             context.HandleResponse();
-            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
 
             return context.Response.WriteAsJsonAsync(new ErrorResponse
             {

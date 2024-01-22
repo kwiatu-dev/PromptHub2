@@ -1,5 +1,6 @@
 import axios from 'axios'
 import handleRequest from '@/helpers/handleRequest'
+import syncTabs from '@/helpers/syncTabs'
 
 const state = () => ({
   project: null,
@@ -66,6 +67,7 @@ const mutations = {
   },
   AddProject(state, project){
     state.projects.push(project)
+    syncTabs.emitPageChangedEvent()
   },
   EditProject(state, data){
     const { guid, project } = data
@@ -81,6 +83,8 @@ const mutations = {
     if(state.project?.id === guid){
       state.project = project
     }
+
+    syncTabs.emitPageChangedEvent()
   },
   DeleteProject(state, guid){
     if(state.projects?.length){
@@ -94,6 +98,8 @@ const mutations = {
     if(state.project?.id === guid){
       state.project = null
     }
+
+    syncTabs.emitPageChangedEvent()
   },
   ResetProjectState(state){
     state.project = null

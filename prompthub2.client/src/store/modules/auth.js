@@ -1,7 +1,8 @@
 import axios from 'axios'
 import handleRequest from '@/helpers/handleRequest'
 import logoutTabs from '@/helpers/syncTabs'
-import cookies from '@/helpers/cookies'
+import { resetStore } from '@/helpers/resetStore'
+import refreshTokenTimer from '@/helpers/refreshTokenTimer'
 
 const state = () => ({
   accessToken: null,
@@ -31,18 +32,12 @@ const actions = {
     if(result?.user && result?.token){
       commit('SetUser', result.user)
       commit('SetAccessToken', result.token)
+      refreshTokenTimer.start()
       logoutTabs.emitLoginEvent()
     }
     
     await dispatch('GetAntiForgeryToken')
   },
-  // LogInFromCookie({ commit }){
-  //   const user = cookies.getUser()
-
-  //   if(user){
-  //     commit('SetUser', user)
-  //   }
-  // },
   async TryToLogInWithRefreshToken({ dispatch }){
     const { success, result } = await handleRequest(axios.get, '/Authenticate/Refresh')
 
@@ -52,25 +47,12 @@ const actions = {
 
     return result
   },
-  // async LogOut({ commit }){
-  //   cookies.removeUser()
-  //   commit('RemoveAntiForgeryToken')
-  //   commit('ResetProjectState')
-  //   commit('ResetProjectsState')
-  //   commit('ResetPromptState')
-  //   commit('ResetPromptsState')
-  //   commit('LogOut')
-  // },
-  async LogOut({ commit }){
+  async LogOut(){
     const { success } = await handleRequest(axios.delete, '/Authenticate/LogOut')
 
     if(success){
-      commit('RemoveAntiForgeryToken')
-      commit('ResetProjectState')
-      commit('ResetProjectsState')
-      commit('ResetPromptState')
-      commit('ResetPromptsState')
-      commit('LogOut')
+      resetStore()
+      refreshTokenTimer.stop()
     }
   },
   async ConfirmEmail(_, payload){

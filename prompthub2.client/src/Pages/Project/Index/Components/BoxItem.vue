@@ -49,7 +49,7 @@
           title="Edit project"
           :object="project"
         />
-        <DeleteButton :project="project" />
+        <DeleteButton :project="project" @deleted="emit('deleted')" />
       </div>
     </div>
   </div>
@@ -67,4 +67,6 @@ defineProps({
   },
   view: String,
 })
+
+const emit = defineEmits(['deleted'])
 </script>

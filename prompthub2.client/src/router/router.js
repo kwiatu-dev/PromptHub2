@@ -8,6 +8,7 @@ import ConfirmEmail from '@/Pages/Auth/ConfirmEmail.vue'
 import ForgotPasswordPage from '@/Pages/User/ForgotPasswordPage.vue'
 import ResetPasswordPage from '@/Pages/User/ResetPasswordPage.vue'
 import AdminPage from '@/Pages/Admin/AdminPage.vue'
+import EmptyTemplate from '@/components/EmptyTemplate.vue'
 import store from '@/store'
 
 const routes = [
@@ -65,6 +66,11 @@ const routes = [
     component: AdminPage,
     name: 'admin',
     meta: { roles: ['admin'] },
+  },
+  {
+    path: '/empty',
+    component: EmptyTemplate,
+    name: 'empty',
   },
 ]
 
